@@ -54,10 +54,10 @@ If you get a "repository not found" error, create the repo first:
 1. Go to **https://dash.cloudflare.com/pages**
 2. Click **"Create project"** → **"Connect to Git"**
 3. Select **GitHub** and authorize Cloudflare
-4. Choose repository: `vocab-learner/agnes-ai-playground`
+4. Choose repository: `957012880/agnes-ai-playground`
 5. Configure build settings:
    - **Framework preset**: `None`
-   - **Build command**: *(leave empty)*
+   - **Build command**: `cp agnes-playground-v2.html index.html`
    - **Build output directory**: `.`
    - **Environment variables**: None needed
 6. Click **"Save and Deploy"**

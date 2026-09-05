@@ -10,29 +10,27 @@
 
 打开 **Git Bash** 或 **PowerShell**，运行以下命令：
 
-### 第 1 步：推送到 GitHub
+### 第 1 步：推送到 GitHub ✅ 已完成
 
+代码已通过 API 推送到 GitHub：
+- **仓库**: https://github.com/957012880/agnes-ai-playground
+- **分支**: main
+
+如需手动推送：
 ```bash
 cd E:\workbuddy\chengxu
 git push -u origin main
 ```
-
-如果提示仓库不存在，先在 GitHub 创建：
-1. 访问 https://github.com/new
-2. Repository name: `agnes-ai-playground`
-3. 选择 Public
-4. 点击 Create repository
-5. 然后运行上面的 push 命令
 
 ### 第 2 步：部署到 Cloudflare Pages
 
 **方法 A：使用 Web Dashboard（推荐）**
 1. 访问 https://dash.cloudflare.com/pages
 2. 点击 "Create project" → "Connect to Git"
-3. 选择 GitHub 账号和 `agnes-ai-playground` 仓库
+3. 选择 GitHub 账号和 `957012880/agnes-ai-playground` 仓库
 4. 设置：
    - Framework preset: **None**
-   - Build command: *(留空)*
+   - Build command: `cp agnes-playground-v2.html index.html`
    - Build output directory: **.**
 5. 点击 "Save and Deploy"
 6. 完成后访问 https://agnes-ai-playground.pages.dev
