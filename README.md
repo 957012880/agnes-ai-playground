@@ -4,7 +4,7 @@
 
 ## 在线演示
 
-- **Cloudflare Pages**: https://agnes-ai-playground.pages.dev
+- **Cloudflare Workers**: https://agnes.daoh.ccwu.cc/
 
 ## 功能
 
@@ -20,7 +20,7 @@
 ## 技术栈
 
 - 纯前端 HTML/CSS/JS
-- Cloudflare Pages 部署
+- Cloudflare Workers 部署
 - Agnes AI API
 
 ## 本地运行
@@ -29,20 +29,12 @@
 
 ## 部署
 
-### Cloudflare Pages
+### Cloudflare Workers
 
 1. 将代码推送到 GitHub 仓库
-2. 在 Cloudflare Dashboard 连接 GitHub 仓库
-3. 选择构建配置：
-   - Build command: （留空）
-   - Build output: `.`
-4. 部署完成后可访问 https://your-project.pages.dev
-
-## API 配置
-
-在页面设置中配置：
-- API Key：从 [platform.agnes-ai.com](https://platform.agnes-ai.com) 获取
-- Base URL：选择国际站或国内站
+2. 在 Cloudflare Dashboard 创建 Worker
+3. 上传 `index.html` 文件作为 Worker 响应内容
+4. 配置自定义域名（可选）
 
 ## 许可证
 

@@ -16,7 +16,7 @@ A full-featured AI playground supporting text chat, text-to-image, image-to-imag
 ## Tech Stack
 
 - Pure frontend HTML/CSS/JS
-- Cloudflare Pages deployment
+- Cloudflare Workers deployment
 - Agnes AI API
 
 ## Local Usage
@@ -25,14 +25,12 @@ Simply double-click `agnes-playground-v2.html` to open it in your browser.
 
 ## Deployment
 
-### Cloudflare Pages
+### Cloudflare Workers
 
 1. Push code to GitHub repository
-2. Connect GitHub repository in Cloudflare Dashboard
-3. Build configuration:
-   - Build command: `cp agnes-playground-v2.html index.html`
-   - Build output: `.`
-4. Deploy and access at https://your-project.pages.dev
+2. In Cloudflare Dashboard, go to Workers & Pages
+3. Upload `index.html` as Worker response content
+4. Configure custom domain (optional)
 
 ## API Configuration
 
