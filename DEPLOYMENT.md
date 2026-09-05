@@ -35,7 +35,7 @@ git push -u origin main
 
 **Note:** The remote is already configured as:
 ```
-https://@github.com/vocab-learner/agnes-ai-playground.git
+https://YOUR_GITHUB_TOKEN@github.com/vocab-learner/agnes-ai-playground.git
 ```
 
 If you get a "repository not found" error, create the repo first:

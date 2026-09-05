@@ -1,7 +1,7 @@
 # GitHub API Push Script for Agnes AI Playground
 $ErrorActionPreference = "Continue"
 
-$GITHUB_TOKEN = ""
+$GITHUB_TOKEN = "YOUR_GITHUB_TOKEN"
 $REPO_NAME = "agnes-ai-playground"
 $REPO_URL = "https://api.github.com/user/repos"
 $BRANCH = "main"

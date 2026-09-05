@@ -40,7 +40,7 @@ git push -u origin main
 **方法 B：使用 Cloudflare API**
 ```bash
 # 设置环境变量
-export CF_API_TOKEN=""
+export CF_API_TOKEN="YOUR_CLOUDFLARE_API_TOKEN"
 export CF_ACCOUNT_ID="YOUR_ACCOUNT_ID"
 
 # 创建 Pages 项目
