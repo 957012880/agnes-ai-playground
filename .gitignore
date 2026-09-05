@@ -1,0 +1,22 @@
+# Node
+node_modules/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backups (keep only latest)
+agnes-playground-v2-backup-*.html
+!agnes-playground-v2.html
