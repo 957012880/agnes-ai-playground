@@ -1,20 +1,19 @@
-# Agnes AI Playground - 快速部署脚本
+# Agnes AI Playground - 快速开始
 
 ## 📋 前置条件
 
 1. ✅ Git 已安装
-2. ✅ GitHub 账号已创建仓库 `vocab-learner/agnes-ai-playground`
+2. ✅ GitHub 账号已创建仓库 `957012880/agnes-ai-playground`
 3. ✅ Cloudflare 账号已准备好
 
-## 🚀 一键部署（在本地终端运行）
+## 🚀 部署步骤
 
-打开 **Git Bash** 或 **PowerShell**，运行以下命令：
+### 第 1 步：推送到 GitHub
 
-### 第 1 步：推送到 GitHub ✅ 已完成
-
-代码已通过 API 推送到 GitHub：
+代码已推送到 GitHub：
 - **仓库**: https://github.com/957012880/agnes-ai-playground
 - **分支**: main
+- **文件**: 9 个
 
 如需手动推送：
 ```bash
@@ -22,48 +21,37 @@ cd E:\workbuddy\chengxu
 git push -u origin main
 ```
 
-### 第 2 步：部署到 Cloudflare Pages
+### 第 2 步：部署到 Cloudflare Workers
 
-**方法 A：使用 Web Dashboard（推荐）**
+**方法 A：手动上传（推荐）**
+1. 访问 https://dash.cloudflare.com/workers
+2. 点击 "Create Worker"
+3. 上传 `index.html` 文件作为 Worker 响应内容
+4. 保存并部署
+5. 访问 https://agnes.daoh.ccwu.cc
+
+**方法 B：使用 Pages（备用）**
 1. 访问 https://dash.cloudflare.com/pages
-2. 点击 "Create project" → "Connect to Git"
-3. 选择 GitHub 账号和 `957012880/agnes-ai-playground` 仓库
-4. 设置：
+2. 创建项目并连接 GitHub 仓库
+3. 配置：
    - Framework preset: **None**
    - Build command: `cp agnes-playground-v2.html index.html`
-   - Build output directory: **.**
-5. 点击 "Save and Deploy"
-6. 完成后访问 https://agnes-ai-playground.pages.dev
-
-**方法 B：使用 Cloudflare API**
-```bash
-# 设置环境变量
-export CF_API_TOKEN="YOUR_CLOUDFLARE_API_TOKEN"
-export CF_ACCOUNT_ID="YOUR_ACCOUNT_ID"
-
-# 创建 Pages 项目
-curl -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects" \
-  -H "Authorization: Bearer $CF_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"agnes-ai-playground","production_branch":"main"}'
-
-# 连接 GitHub 仓库
-curl -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/agnes-ai-playground/git" \
-  -H "Authorization: Bearer $CF_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"type":"github","repo":"vocab-learner/agnes-ai-playground"}'
-```
+   - Build output: `.`
+4. 点击 "Save and Deploy"
 
 ## 📁 项目结构
 
 ```
 E:\workbuddy\chengxu\
 ├── agnes-playground-v2.html    # 主应用文件 (138KB)
-├── README.md                    # 项目说明
-├── DEPLOYMENT.md                # 部署指南
-├── deploy.ps1                   # PowerShell 部署脚本
-├── .gitignore                   # Git 忽略规则
-└── .workbuddy/                  # 工作区配置
+├── index.html                  # 入口文件（复制自主应用）
+├── README.md                   # 中文说明
+├── README.en.md                # 英文说明
+├── DEPLOYMENT.md               # 部署指南（中文）
+├── DEPLOYMENT.en.md            # 部署指南（英文）
+├── QUICKSTART.md               # 快速开始指南
+├── .gitignore                  # Git 忽略规则
+└── .workbuddy/                 # 工作区配置
 ```
 
 ## ✨ 功能列表
@@ -80,27 +68,19 @@ E:\workbuddy\chengxu\
 
 ## 🔧 故障排除
 
-### GitHub Push 失败
-```bash
-# 检查远程配置
-git remote -v
+### Cloudflare Workers 部署失败
+- 确保上传的是 `index.html` 文件
+- 检查 Worker 代码是否正确返回 HTML
 
-# 重新设置远程
-git remote set-url origin https://YOUR_TOKEN@github.com/vocab-learner/agnes-ai-playground.git
+### API Key 不工作
+- 验证 Key 在 https://platform.agnes-ai.com
+- 国际站：`https://apihub.agnes-ai.com/v1`
+- 国内站：`https://apihub.agnes-ai.cn/v1`
 
-# 强制推送
-git push -f origin main
-```
+## 📝 当前状态
 
-### Cloudflare 部署失败
-- 确保 "Build output directory" 设置为 `.`
-- 不需要 build command（纯静态 HTML）
-- 查看 Cloudflare dashboard 中的部署日志
-
-## 📝 后续步骤
-
-1. 推送代码到 GitHub
-2. 连接到 Cloudflare Pages
-3. 测试在线站点
-4. （可选）配置自定义域名
-5. （可选）添加 MCP 功能集成
+1. ✅ 代码已推送到 GitHub
+2. ✅ Cloudflare Workers 部署成功
+3. ✅ 在线访问：https://agnes.daoh.ccwu.cc/
+4. (可选) 配置自定义域名
+5. (可选) 添加 MCP 功能集成
