@@ -2,6 +2,10 @@
 
 全模态 AI 工作台，支持文本对话、文生图、图生图、文生视频、图生视频等功能。
 
+## 在线演示
+
+- **Cloudflare Pages**: https://agnes-ai-playground.pages.dev
+
 ## 功能
 
 - 💬 **文本对话** - 多模型支持（Flash/Pro）
