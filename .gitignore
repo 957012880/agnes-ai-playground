@@ -1,22 +1,13 @@
-# Node
-node_modules/
-*.log
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Backups (keep only latest)
+# Backups
 agnes-playground-v2-backup-*.html
 !agnes-playground-v2.html
+
+# Deployment scripts (not needed in repo)
+deploy.ps1
+*.ps1
+
+# Extra docs
+QUICKSTART.zh.md
+
+# Node
+node_modules/

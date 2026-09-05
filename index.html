@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="ARAmDpXXl6whKaKuoJfY1J">
+<head data-page-node-id="TXDelVVVu0MAq7X5sXPGHZ">
+<meta charset="UTF-8" data-page-node-id="UHztC2ghtmb7sa68S4RElv">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="P1UaWfDwZvdHIsIgLoeWqW">
+<title>Agnes AI Playground v2.0 - 全模态 AI 工作台</title>
+<style>
+/* Dark theme (default) */
+:root {
+  --bg: #0f1117; --card: #1a1d2e; --card2: #222640; --text: #e2e4f0; --muted: #8b8fa3;
+  --accent: #7c5cfc; --accent2: #00d4aa; --accent3: #ff6b6b; --border: #2a2e45;
+  --ok: #22c55e; --warn: #f59e0b; --err: #ef4444; --info: #3b82f6;
+  --code-bg: #0d0f18;
+}
+/* Light theme */
+:root.light {
+  --bg: #f5f7fa; --card: #ffffff; --card2: #e8ecf1; --text: #1a1d2e; --muted: #6b7280;
+  --accent: #6d4cf0; --accent2: #059669; --accent3: #dc2626; --border: #d1d5db;
+  --ok: #16a34a; --warn: #d97706; --err: #dc2626; --info: #2563eb;
+  --code-bg: #f3f4f6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; transition: background .2s, color .2s; }
+.layout { display: flex; min-height: 100vh; }
+/* Sidebar */
+.sidebar { width: 240px; background: var(--card); border-right: 1px solid var(--border); padding: 20px 12px; position: fixed; height: 100vh; overflow-y: auto; }
+.sidebar h1 { font-size: 17px; margin-bottom: 2px; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+.sidebar .version { font-size: 11px; color: var(--muted); margin-bottom: 24px; }
+.nav-group { margin-bottom: 18px; }
+.nav-group h3 { font-size: 10px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; }
+.nav-item { display: block; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text); text-decoration: none; margin-bottom: 2px; transition: all .15s; }
+.nav-item:hover { background: var(--card2); }
+.nav-item.active { background: var(--accent); color: #fff; }
+.nav-item .icon { margin-right: 6px; }
+/* Main */
+.main { margin-left: 240px; flex: 1; padding: 28px 36px; max-width: 1000px; }
+.section { display: none; }
+.section.active { display: block; animation: fadeIn .3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+h2 { font-size: 22px; margin-bottom: 16px; }
+h3 { font-size: 16px; margin: 20px 0 10px; font-weight: 600; }
+h4 { font-size: 14px; margin: 12px 0 6px; color: var(--muted); }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+.card-title { font-weight: 600; font-size: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+/* Inputs */
+textarea, input[type="text"], input[type="password"], select {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; background: var(--card2); color: var(--text); font-family: inherit;
+  transition: border-color .15s;
+}
+textarea:focus, input:focus, select:focus { outline: none; border-color: var(--accent); }
+textarea { min-height: 80px; resize: vertical; }
+label.field-label { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 4px; display: block; }
+.form-group { margin-bottom: 14px; }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all .15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #6a4ae0; }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-danger { background: var(--err); color: #fff; }
+/* Code */
+pre { background: var(--code-bg); color: #cdd6f4; padding: 14px; border-radius: 10px; overflow-x: auto; font-size: 12px; line-height: 1.5; margin: 10px 0; position: relative; }
+pre code { background: none; padding: 0; color: inherit; font-family: "SF Mono", Monaco, monospace; }
+.code-inline { font-family: "SF Mono", Monaco, monospace; font-size: 12px; background: var(--card2); padding: 2px 6px; border-radius: 4px; color: var(--accent2); }
+/* Chips */
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.chip { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card2); cursor: pointer; font-size: 12px; transition: all .15s; }
+.chip:hover { border-color: var(--accent); }
+.chip.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* Badges */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #166534; color: #4ade80; }
+.badge-red { background: #991b1b; color: #f87171; }
+.badge-blue { background: #1e3a5f; color: #60a5fa; }
+.badge-purple { background: #581c87; color: #c084fc; }
+.badge-amber { background: #78350f; color: #fbbf24; }
+/* Alerts */
+.alert { padding: 12px 16px; border-radius: 8px; margin: 10px 0; font-size: 13px; border-left: 4px solid; }
+.alert-info { background: #1e3a5f; border-color: var(--info); color: #93c5fd; }
+.alert-ok { background: #14532d; border-color: var(--ok); color: #86efac; }
+.alert-warn { background: #451a03; border-color: var(--warn); color: #fcd34d; }
+.alert-err { background: #450a0a; border-color: var(--err); color: #fca5a5; }
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+/* Table */
+table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--card2); font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; }
+/* Output area */
+.output-area { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-height: 60px; font-size: 13px; white-space: pre-wrap; word-break: break-word; margin: 10px 0; position: relative; line-height: 1.7; }
+.output-area img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+.output-area video { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+.copy-btn { position: absolute; top: 8px; right: 8px; font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,.08); color: var(--muted); border: 1px solid rgba(255,255,255,.15); cursor: pointer; transition: all .15s; }
+.copy-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+/* Progress */
+.progress-bar { height: 4px; background: var(--card2); border-radius: 2px; overflow: hidden; margin: 10px 0; }
+.progress-bar .fill { height: 100%; background: var(--accent); transition: width .3s; width: 0%; }
+/* Status */
+.status-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 10px 14px; background: var(--card2); border-radius: 8px; margin: 10px 0; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--muted); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Toast */
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 10px; font-size: 13px; z-index: 9999; animation: slideUp .3s ease; max-width: 360px; }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* History */
+.history-item { padding: 10px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s; }
+.history-item:hover { background: var(--card2); }
+.history-item:last-child { border-bottom: none; }
+.history-item .h-time { font-size: 11px; color: var(--muted); }
+.history-item .h-prompt { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Prompt templates */
+.prompt-template { padding: 12px; background: var(--card2); border-radius: 8px; margin: 8px 0; cursor: pointer; transition: border-color .15s; border: 1px solid transparent; }
+.prompt-template:hover { border-color: var(--accent); }
+.prompt-template .pt-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.prompt-template .pt-desc { font-size: 11px; color: var(--muted); }
+/* API key management */
+.key-display { display: flex; align-items: center; gap: 8px; }
+.key-display .key-masked { font-family: monospace; font-size: 13px; color: var(--muted); letter-spacing: 1px; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+/* Model card for settings */
+.model-card { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--card2); border-radius: 8px; margin: 6px 0; }
+.model-card .model-name { font-size: 13px; font-weight: 600; }
+.model-card .model-meta { font-size: 11px; color: var(--muted); }
+/* Responsive - Phone */
+@media (max-width: 768px) {
+  /* Sidebar as top nav */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    width: 100%; height: auto;
+    padding: 10px 8px;
+    z-index: 1000;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    max-height: 48px;
+    overflow: hidden;
+    transition: max-height .3s;
+  }
+  .sidebar.collapsed { max-height: 200px; }
+  .sidebar.collapsed h1, .sidebar.collapsed .version { display: none; }
+  /* Hamburger button */
+  .sidebar-toggle {
+    display: flex; position: fixed; top: 8px; left: 8px; z-index: 1001;
+    width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text); font-size: 20px;
+    cursor: pointer; align-items: center; justify-content: center;
+    touch-action: manipulation;
+  }
+  .nav-group { margin-bottom: 0; display: flex; gap: 2px; flex: 1; flex-wrap: wrap; }
+  .nav-group h3 { display: none; }
+  .nav-item { padding: 8px 10px; font-size: 13px; margin-bottom: 0; white-space: nowrap; min-height: 44px; display: flex; align-items: center; }
+  .nav-item .icon { margin-right: 4px; }
+  .main { margin-left: 0; padding: 64px 12px 24px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .form-row { flex-direction: column; gap: 0; }
+  .chat-bubble-wrap { max-width: 90% !important; }
+  h2 { font-size: 20px; margin-bottom: 12px; }
+  h3 { font-size: 15px; margin: 16px 0 8px; }
+  table { font-size: 11px; }
+  th, td { padding: 6px 8px; }
+  /* Touch-friendly inputs */
+  input[type="text"], input[type="password"], input[type="number"], select, textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+  .btn { padding: 12px 24px; font-size: 15px; min-height: 44px; }
+  .btn-primary, .btn-secondary { min-height: 44px; }
+  /* Output areas */
+  .output-area { padding: 12px; font-size: 12px; }
+  .output-area img, .output-area video { max-width: 100%; height: auto; }
+  /* Cards */
+  .card { padding: 14px; }
+  /* Toast */
+  .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; font-size: 12px; }
+  /* Copy buttons */
+  .copy-btn { padding: 6px 12px; font-size: 12px; }
+  /* Prompt templates */
+  .prompt-template { padding: 14px; }
+  .prompt-template .pt-title { font-size: 14px; }
+  .prompt-template .pt-desc { font-size: 12px; }
+  /* Model cards */
+  .model-card { padding: 12px; }
+  .model-card .model-name { font-size: 12px; }
+  .model-card .model-meta { font-size: 10px; }
+}
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar { width: 220px; padding: 16px 12px; }
+  .nav-item { font-size: 13px; padding: 9px 12px; }
+  .nav-group h3 { font-size: 10px; }
+  .main { margin-left: 220px; padding: 28px 24px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .form-row { flex-wrap: wrap; }
+  .form-row .form-group { min-width: 200px; }
+  h2 { font-size: 20px; }
+  .btn { padding: 11px 22px; }
+  input[type="text"], input[type="password"], input[type="number"], select, textarea {
+    font-size: 15px;
+    padding: 11px 13px;
+  }
+  .output-area { padding: 14px; }
+  .card { padding: 16px; }
+}
+/* Desktop */
+@media (min-width: 1025px) {
+  .sidebar-toggle { display: none !important; }
+}
+/* Theme toggle */
+#theme-toggle:hover { background: var(--card2); }
+</style>
+</head>
+<body data-page-node-id="0Hi9lQj4byeUPxuHzrkuYa">
+<div class="layout" data-page-node-id="i9EBqCCMP9dws3DtIxxUel">
+  <aside class="sidebar" id="sidebar" data-page-node-id="IMKX3NJl6M9z3PE3DZQDZ0">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h1 data-page-node-id="julCaBjtOTQbeVlJmbUBhS">🧠 Agnes AI</h1>
+      <button id="theme-toggle" onclick="toggleTheme()" title="切换白天/夜晚模式" style="background:none; border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:16px; color:var(--text); transition:all .15s;" data-page-node-id="theme-toggle-id">🌙</button>
+    </div>
+    <div class="version" data-page-node-id="G3eCIlRCo1Q8Xvxo64vPjt">Playground v2.0</div>
+    <div class="nav-group" data-page-node-id="D5bz40q2GBA7B2sr8ZYrbo">
+      <h3 data-page-node-id="4DMgiBGGOqcGACNok9BSXm">设置</h3>
+      <a class="nav-item active" data-target="settings" data-page-node-id="xBbjF3LTSD3fEOGHpbpqe3"><span class="icon" data-page-node-id="FBEDLA5F4FTBnMN5CVO7Rc">⚙️</span>API Key 设置</a>
+    </div>
+    <div class="nav-group" data-page-node-id="a3IHrBrTI66P0laeCGQGLj">
+      <h3 data-page-node-id="hV0aya0uVIDLRYzH1qDtL6">功能</h3>
+      <a class="nav-item" data-target="chat" data-page-node-id="tm0lkf9wU3FJezWBXANGtx"><span class="icon" data-page-node-id="2cBGKvnhDPpvMCvb8mQhqn">💬</span>文本对话</a>
+      <a class="nav-item" data-target="image" data-page-node-id="yOFHrHzOHt3kjdob39JFOM"><span class="icon" data-page-node-id="DpgAApnbaHHoMQUEYNY3Ly">🖼️</span>文生图</a>
+      <a class="nav-item" data-target="img2img" data-page-node-id="rnv8vDKPbdv0oDZH6Y9ADu"><span class="icon" data-page-node-id="sA69lB2srtcEhKmSa64raq">🎨</span>图生图</a>
+      <a class="nav-item" data-target="video" data-page-node-id="7ndLkedmg7HcIEIM8F7fYn"><span class="icon" data-page-node-id="xpzVnQQVduYq8FGSqVXPHQ">🎬</span>文生视频</a>
+      <a class="nav-item" data-target="img2vid" data-page-node-id="bh891VrpnnDwiHbUNnVG41"><span class="icon" data-page-node-id="MMk1GGOCsQuPlGsWRhCmO6">🖼️</span>图生视频</a>
+      <a class="nav-item" data-target="keyframes" data-page-node-id="ETvjdmUMjdDzR0oNeWWrxK"><span class="icon" data-page-node-id="TvIQS2jTyhVbUlu5AnWEtE">🎞️</span>多图/关键帧视频</a>
+    </div>
+    <div class="nav-group" data-page-node-id="FqDWwsXe9XM2yW0MTWNa3H">
+      <h3 data-page-node-id="xiD6esUdp2jMiz8Fff7aRG">提示词</h3>
+      <a class="nav-item" data-target="prompt-image" data-page-node-id="S8oKM9doSfRugIZ5PO7mbg"><span class="icon" data-page-node-id="uzb8TrMReJCpl4UB351COr">✨</span>文生图提示词</a>
+      <a class="nav-item" data-target="prompt-video" data-page-node-id="2icD59Wqf6uNmopEjQZsZ8"><span class="icon" data-page-node-id="FmL5YU9PIcpZHfmQov2JIe">✨</span>文生视频提示词</a>
+    </div>
+    <div class="nav-group" data-page-node-id="1vutpnGABGFFmSlqn6bCej">
+      <h3 data-page-node-id="SiStiXpBL5kjuADzeEVc0D">工具</h3>
+      <a class="nav-item" data-target="history" data-page-node-id="KifgyalXZByCHV3WHbL7Nz"><span class="icon" data-page-node-id="VuKjNDovKRD48YfF4cgsKH">📜</span>历史记录</a>
+      <a class="nav-item" data-target="models" data-page-node-id="kGVZQNYWGxiBB9S7KyDctR"><span class="icon" data-page-node-id="DA3OxLvSRoe8aGEDERTolm">📋</span>模型速查</a>
+    </div>
+  </aside>
+  <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="切换菜单" data-page-node-id="EWEFKeZ3bXFYQERHFxMNIf">☰</button>
+
+  <main class="main" data-page-node-id="epqp0fN6q1SxdnpQ1qE7lj">
+
+    <!-- ========== Settings ========== -->
+    <section id="settings" class="section active" data-page-node-id="yBCZkoS3ap2dIDzZEwvr35">
+      <h2 data-page-node-id="I50cGanqKxGcT7JtVRbGX5">⚙️ API Key 设置</h2>
+      <div class="card" data-page-node-id="XCmAoNUlkAYIpqzVHbrBGJ">
+        <div class="card-title" data-page-node-id="7YJC0ulLA2fGFIinDm6jm6">🔑 配置 API Key</div>
+        <div class="form-group" data-page-node-id="t8BGnd5SKFC73S0bT2A5iy">
+          <label class="field-label" data-page-node-id="wMxCCxphFVYXtkYnmsdK8T">API Key</label>
+          <div class="key-display" data-page-node-id="cS0MWHCIGfOe8cC041bmCz">
+            <input type="password" id="api-key-input" placeholder="sk-..." style="flex:1;" data-page-node-id="gGngXiy65NMKytmNX6ilSv">
+            <button class="btn btn-secondary btn-sm" onclick="toggleKeyVisibility()" data-page-node-id="nxOYDIPLT5yUkbJhF2hjaN">👁️ 显示</button>
+          </div>
+        </div>
+        <div class="form-group" data-page-node-id="zAMUzSdGOuP2cCrRYbeTz0">
+          <label class="field-label" data-page-node-id="EwTsXcZco3OHQ0ieV8Fiel">Base URL（区域）</label>
+          <select id="base-url-select" onchange="onBaseUrlChange()" data-page-node-id="IfUiLtqX6p8Y5yFGWVqQ8z">
+            <option value="https://apihub.agnes-ai.com/v1" data-page-node-id="HuXDdkQmfRPCAujV6HVluc">🌐 国际站 (apihub.agnes-ai.com/v1)</option>
+            <option value="https://apihub.agnes-ai.cn/v1" data-page-node-id="EtVWpajHSZeHQAtje0Y0NX">🇨🇳 国内站 (apihub.agnes-ai.cn/v1)</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:8px;" data-page-node-id="uFgvdHblLKMU5O3GdlGtdS">
+          <button class="btn btn-primary" onclick="saveApiKey()" data-page-node-id="qA9Y4odswWB3JKUtoW8g9C">💾 保存并测试</button>
+          <button class="btn btn-danger btn-sm" onclick="clearApiKey()" id="clear-key-btn" style="display:none;" data-page-node-id="Y5YO8zUmbGlPmwMh6pyRxM">🗑️ 删除 Key</button>
+        </div>
+        <div id="key-status" data-page-node-id="UCM05rChVI5YuV0E4rc8Il"></div>
+      </div>
+      <div class="alert alert-info" data-page-node-id="RgDGmpSxMGVxBFrANeDNlq">
+        <strong data-page-node-id="T1KEPPfORG8XCqtzST3mUL">📌 如何获取 API Key：</strong>前往
+        <a href="https://platform.agnes-ai.com" target="_blank" style="color:var(--accent);" data-page-node-id="32qUzDLCAhdW10BFD6BhHJ">platform.agnes-ai.com</a>
+        注册/登录 → Settings → API Keys → Create new secret key → 复制保存
+      </div>
+      <div class="card" data-page-node-id="g5e2qdOoCBIxchIMPMq9JR">
+        <div class="card-title" data-page-node-id="83IHyCLpOM8FqTno79gyCx">📋 接口概览</div>
+        <table data-page-node-id="ktHFdUZQVs8Gz92kezvcH4">
+          <tr data-page-node-id="9b0sjBkIVDGPfsHAhhUDSS"><th data-page-node-id="RVuF4j1bx12ib29bV1x6f0">功能</th><th data-page-node-id="HwDz7xOvO9OqpqUEG8NHNY">端点</th><th data-page-node-id="EjvoPg55doFtinWFIbMFAe">推荐模型</th><th data-page-node-id="yYO2BNtAnm6q3VtOC5tCWp">RPM</th></tr>
+          <tr data-page-node-id="BVVTvaWclLYW44zZabK9vX"><td data-page-node-id="FnEoTCFEFqDYvonqe1627B">文本对话</td><td data-page-node-id="HNU6gzaqZVjtgF4qPJAJqV"><span class="code-inline" data-page-node-id="xAqAg4DEK29ZXHxwHHio0h">POST /v1/chat/completions</span></td><td data-page-node-id="BSM404vxuTt2dSbL1ey3Vt">agnes-2.5-flash ✅免费</td><td data-page-node-id="vH9lfa6gE70K7VBEoy746R">20</td></tr>
+          <tr data-page-node-id="cb2uG9oKFJH7ZmDKkrvEqS"><td data-page-node-id="dS40rpe5kcOk4UpaJtgjSx">文生图</td><td data-page-node-id="i96VOkzlORNUNLyEaCVPQi"><span class="code-inline" data-page-node-id="mwclb36XLV4geVdF0YocYL">POST /v1/images/generations</span></td><td data-page-node-id="qnTGHIAuk5bES0hy5HItLB">agnes-image-2.1-flash ✅免费</td><td data-page-node-id="hZsTnLP72hLhn8FBRhtagh">1K:20 / 2K:10 / 3-4K:1</td></tr>
+          <tr data-page-node-id="MlDpKJPdS0rpydytt5hTVB"><td data-page-node-id="WmGVCv6nU3pTOeuY3zgFEs">图生图</td><td data-page-node-id="fKW8jLyR7GfivASelG10rz"><span class="code-inline" data-page-node-id="h2nALbmaZKuLyQd30h2UIO">POST /v1/images/generations</span> (extra_body.image)</td><td data-page-node-id="kyhkfl6G16Ic6fb4P2xVPL">agnes-image-2.1-flash ✅免费</td><td data-page-node-id="QeoZbHEBcLc3YEvSkTQOCE">同上</td></tr>
+          <tr data-page-node-id="EGAvjnvErfU0AQ74Wxd37R"><td data-page-node-id="qZf76XIPSPx9KT3U7sHhA2">文生视频 v2.5 Flash</td><td data-page-node-id="M1K4R1VYui1tkx8jcNEJqg"><span class="code-inline" data-page-node-id="vasMAzeLa4xwYn8I2pv5A1">POST /v1/videos</span></td><td data-page-node-id="2EiHqpmnhpC7ZDaNDLQ8fQ">agnes-video-2.5-flash ✅限时免费</td><td data-page-node-id="NoGPIvJEzB5zjfWJM0ep8C">1</td></tr>
+          <tr data-page-node-id="og0eaGK6SbwMD53I8LIqBO"><td data-page-node-id="bKeeLnOnh0Q6CJAMa6EGCA">文生视频 v2.0</td><td data-page-node-id="FtFnZ0ikNb4Lb5HcktXnmD"><span class="code-inline" data-page-node-id="Xpq9s2OA87YrSNjSZDtRyg">POST /v1/videos</span></td><td data-page-node-id="PRdk4WPlqyqO1ewgEeiVCf">agnes-video-v2.0 ✅免费</td><td data-page-node-id="D5PmBTFwqMqGDqEYZHFB0h">1</td></tr>
+          <tr data-page-node-id="WAf1vmtbjSftXGTmxNDOMd"><td data-page-node-id="M8GnhW1ePmloRgqEH9EhBm">查询视频结果</td><td data-page-node-id="hfP6UMysn8rQ5MQhSg1DoG"><span class="code-inline" data-page-node-id="UKqrxCGkNWWZXDHsakhqLU">GET /agnesapi?video_id=ID</span></td><td data-page-node-id="drFeVc9IGyq0y5tG9g3ZzC">-</td><td data-page-node-id="jEvvtRn7VaGEWjobHB2ZyA">-</td></tr>
+        </table>
+        <div class="alert alert-ok" style="margin-top:8px;" data-page-node-id="nZbXDqzdoG9B1wpoyQhBpU">
+          💡 所有 Flash 系列模型当前<strong data-page-node-id="xpZ4Yo1HpGkf0fZ7WA90vS">免费</strong>调用（文本/图片 RPM≤20，视频 RPM≤1）；<br data-page-node-id="EaQAFdrx9NYDFfOb1YA8lb">
+          📐 图片尺寸须为 <strong data-page-node-id="DmovySEJiAWHehI8AQ6je1">16 的倍数</strong>，否则可能返回 500 错误。
+        </div>
+      </div>
+      <div class="card" data-page-node-id="YTd21Za83KT5UGvG9vk1HW">
+        <div class="card-title" data-page-node-id="VW6cOIdIvBaJCpa2qgrPnM">📦 模型列表</div>
+        <div class="model-card" data-page-node-id="hBfoKtvrinuE6JqoRZg5ba">
+          <div data-page-node-id="MFST25D9Yu8qkq7pACN3Ui"><div class="model-name" data-page-node-id="3RdsWxxGHWiWthKFm5XGFa">agnes-2.5-flash</div><div class="model-meta" data-page-node-id="HhrAzrbJTu1ogHPu0tUPSq">Context 512K · Max 65536 · 免费 ✅</div></div>
+          <span class="badge badge-green" data-page-node-id="Cf6CVEcADXovZOgDUf1p5j">推荐</span>
+        </div>
+        <div class="model-card" data-page-node-id="XCbcPJDq0DiCcu5BHv35ux">
+          <div data-page-node-id="BrGZPNgnzyDPq71nOdDWGM"><div class="model-name" data-page-node-id="8MDdDFmwfhs9YSxZJryLUW">agnes-2.0-flash</div><div class="model-meta" data-page-node-id="f3fF7nfohWbvSHuwgyckGX">Context 512K · Max 64K · 免费 ✅</div></div>
+          <span class="badge badge-green" data-page-node-id="l33lohaqjVHdk3kTq64kQH">兼容</span>
+        </div>
+        <div class="model-card" data-page-node-id="MRT9BAAgqUy2nn6qipLUSN">
+          <div data-page-node-id="97BxgB7SYYvwmlPymBhbN0"><div class="model-name" data-page-node-id="FCS7knIsBjqmOhX96xqhKF">agnes-image-2.1-flash</div><div class="model-meta" data-page-node-id="5kyYFe3juhsMwds1AbAAYx">高信息密度 · 免费 ✅</div></div>
+          <span class="badge badge-green" data-page-node-id="i9UZa9Ige92WJ91ZpxNYSU">推荐</span>
+        </div>
+        <div class="model-card" data-page-node-id="URrCRIcnS7FJQVPyODcD1F">
+          <div data-page-node-id="ZbQCm2r8V1NE9F4Cxl2RQb"><div class="model-name" data-page-node-id="TQfekPBoB0AE2ro0jhxrJh">agnes-image-2.0-flash</div><div class="model-meta" data-page-node-id="w2jvR4K3dAtYiCveHNqLua">标准图像生成 · 免费 ✅</div></div>
+          <span class="badge badge-green" data-page-node-id="b2uga7Eri2jeEc7cAxudiO">兼容</span>
+        </div>
+        <div class="model-card" data-page-node-id="SgidzI6Cc3r3bFoysY23vY">
+          <div data-page-node-id="7DMYyBzRd0YOqGZFaEXiFx"><div class="model-name" data-page-node-id="dabwkiAMFzCF82TlQmD1Ym">agnes-video-2.5-flash</div><div class="model-meta" data-page-node-id="U3CgEtn2PIw8pLC7HRH0pQ">720P · 限时免费 ✅ · seconds 4-12</div></div>
+          <span class="badge badge-green" data-page-node-id="uvm8dcGWzILblXXrxAcUYJ">推荐</span>
+        </div>
+        <div class="model-card" data-page-node-id="iwbE2Pt20HZL2gV27YR4l9">
+          <div data-page-node-id="QV152bkA1UBfkammXvN6ZN"><div class="model-name" data-page-node-id="jHpDDEdLCcDdNchpWxEyBL">agnes-video-v2.0</div><div class="model-meta" data-page-node-id="caVoa5aqWfqMrIX1FpanJB">异步任务 · 免费 ✅ · num_frames 方式</div></div>
+          <span class="badge badge-blue" data-page-node-id="TDr6OsKOVYLTjSp32wBCAo">旧版</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Chat ========== -->
+    <section id="chat" class="section" data-page-node-id="3jiQfCyMuhdDQgLkQVQ8lE">
+      <h2 data-page-node-id="eW6LZO43OEIwzqgwtknaVs">💬 文本对话</h2>
+      <div class="card" data-page-node-id="C3qc0JBPFdASBw3zpOEoES">
+        <div class="card-title" data-page-node-id="oRsbw2Yw9nB6D4QhXNufYm">配置</div>
+        <div class="form-row" style="margin-bottom:8px;" data-page-node-id="pFJ0dRFOfbBrnmd7uEBYnu">
+          <div class="form-group" style="margin-bottom:0;" data-page-node-id="wAlF1dBMNoOf0d0wkemxpe">
+            <label class="field-label" data-page-node-id="WTejxTArpETzLmqD9PBhTt">模型</label>
+            <select id="chat-model" onchange="chatConfig.model=this.value; localStorage.setItem('agnes_chat_config', JSON.stringify(chatConfig));" data-page-node-id="uSOt5sIinkuIeY2BbC3DD2">
+              <option value="agnes-2.5-flash" selected data-page-node-id="2RJxF8ttTcjZ9mkSUJEnQL">agnes-2.5-flash（推荐，免费）</option>
+              <option value="agnes-2.0-flash" data-page-node-id="793QADmCH2DTyPr8dRaiaw">agnes-2.0-flash（兼容旧版）</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;" data-page-node-id="cXEt7kOrmSPvGPn5XWi1yF">
+            <label class="field-label" data-page-node-id="zXse3SgqN0SOnXfqcfbqOF">Thinking 模式</label>
+            <select id="chat-thinking" onchange="chatConfig.thinking=this.value; localStorage.setItem('agnes_chat_config', JSON.stringify(chatConfig));" data-page-node-id="WTlR28ilWVmd88Ar2DJMAu">
+              <option value="off" selected data-page-node-id="mFsjglBdnuFor6iHWMDgBy">关闭</option>
+              <option value="openai" data-page-node-id="KuQODxiKQJjL0URdYpnLZl">OpenAI 格式</option>
+              <option value="anthropic" data-page-node-id="SfrNKsXtTSWJMc3mY4hn0m">Anthropic 格式</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;" data-page-node-id="x2Z2KiG7KYF3nr8uEtOl5a">
+          <label class="field-label" data-page-node-id="aqXIaavuCcHzY4rIEMSK0l">System Prompt（可选）</label>
+          <input type="text" id="chat-system" placeholder="例如：You are a helpful assistant."
+                 oninput="chatConfig.system=this.value; localStorage.setItem('agnes_chat_config', JSON.stringify(chatConfig));" data-page-node-id="JratfMnR7BEmVadUIzlMPC">
+        </div>
+        <div class="form-row" style="margin-top:8px;" data-page-node-id="6Y2TMXeCq28lXhmVQwIKEw">
+          <div class="form-group" data-page-node-id="M9X8ASwt5417rar0EBTVRh">
+            <label class="field-label" data-page-node-id="D6lcoifWPHF4Ig8v4hXTdU">Temperature</label>
+            <input type="number" id="chat-temp" value="0.7" min="0" max="2" step="0.1"
+                   onchange="chatConfig.temp=parseFloat(this.value); localStorage.setItem('agnes_chat_config', JSON.stringify(chatConfig));" data-page-node-id="2VeePWsn3mSesoWLVOBQxk">
+          </div>
+          <div class="form-group" data-page-node-id="7GFzPmMueBqCeIGmU6ueED">
+            <label class="field-label" data-page-node-id="U54MfDeIh3Du7reGdKLm8q">Max Tokens</label>
+            <input type="number" id="chat-max" value="2048" min="1" max="65536"
+                   onchange="chatConfig.maxTokens=parseInt(this.value); localStorage.setItem('agnes_chat_config', JSON.stringify(chatConfig));" data-page-node-id="2r0eJzx4pOXJML6cufYYVR">
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="clearChat()" style="margin-bottom:8px;" data-page-node-id="k0HK4NSz0lWRKOhHvZ7WP4">🗑️ 清空对话</button>
+      <div id="chat-messages" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;padding:8px 0;" data-page-node-id="0zllxSP8X95gRhUxm7600L"></div>
+      <div style="position:sticky;bottom:0;background:var(--bg);padding-top:8px;" data-page-node-id="YmEEI1rlnkiibYueP80Cb1">
+        <div class="form-group" style="margin-bottom:0;" data-page-node-id="9wVE77Zkk9rzYPO5BYa2tu">
+          <textarea id="chat-input" placeholder="输入消息...（Enter 发送，Shift+Enter 换行）"
+                    style="min-height:48px;resize:vertical;"
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg();}"></textarea>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;" data-page-node-id="gdKdXDn4Y06IaCyQliwybd">
+          <span style="font-size:11px;color:var(--muted);" data-page-node-id="w6CQJ0wPZjtxK4HN0RQ3Wk">💬 上下文: <span id="msg-count" data-page-node-id="O9FGTiA1oCqkZmtueG9NWV">0</span> 条</span>
+          <button class="btn btn-primary btn-sm" onclick="sendChatMsg()" id="chat-send-btn" data-page-node-id="G3ENhX5dmAmjpUKJRGvl6I">🚀 发送</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Image ========== -->
+    <section id="image" class="section" data-page-node-id="5UfBvAgMu0JOj2u6RW1MI0">
+      <h2 data-page-node-id="jfez50vA8QsYoQJazFmYcO">🖼️ 文生图</h2>
+      <div class="card" data-page-node-id="8EiAoccsypOR4vh21zNmUB">
+        <div class="card-title" data-page-node-id="QFIq8ZbE8E8MBcPdbrVLg0">配置</div>
+        <div class="form-row" data-page-node-id="hnfMuq7PsUJDKmP1q1z0QF">
+          <div class="form-group" data-page-node-id="JQk67L3jnXICrvjI4KmuYJ">
+            <label class="field-label" data-page-node-id="f7eTONKpFmuSIlHviBYubG">模型</label>
+            <select id="image-model" data-page-node-id="PTJx6twXuA1RgTyzQqSXjG">
+              <option value="agnes-image-2.1-flash" selected data-page-node-id="cOXPmGSfrhORJRu5fEF9zU">agnes-image-2.1-flash（推荐，高信息密度）</option>
+              <option value="agnes-image-2.0-flash" data-page-node-id="zxw7VkPLvppovwhVzlheA1">agnes-image-2.0-flash（快速）</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="QA3ryVBGDtRIn2QuCCkX2p">
+            <label class="field-label" data-page-node-id="d1LOwppUKY7ZDRoycSiB1n">分辨率档位</label>
+            <select id="image-res" onchange="onImageResChange()" data-page-node-id="DInoHeRjfQwPFt0QrBMG04">
+              <option value="1k" selected data-page-node-id="Cy9GLizjaCqTlZSR3BrsrT">1K（基础）</option>
+              <option value="2k" data-page-node-id="IssPeKl7EP9ZrbRu4ZPi1i">2K（高清）</option>
+              <option value="3k" data-page-node-id="GYv1vz2GeHOLRP8pGSG8h1">3K（超清）</option>
+              <option value="4k" data-page-node-id="B2HvGy98Wha3DEMYDFOKEa">4K（最高清）</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="image-size-row" data-page-node-id="FDGgekoIKBoWJTElIA5Wdy">
+          <div class="form-group" data-page-node-id="9o2omAk22UimPrrrjlUwjE">
+            <label class="field-label" data-page-node-id="9xrnpqpOtwf7PjBRg7Smur">尺寸</label>
+            <select id="image-size" data-page-node-id="kYpw3HXDx26aI7zFfG5M4i">
+              <option value="1024x1024" selected data-page-node-id="uQR8nFAQ0IQoKyH6oSmbyx">1024×1024（方形）</option>
+              <option value="1024x768" data-page-node-id="5seFBJ6m2qMi1nAzWcpiTn">1024×768（横向 4:3）</option>
+              <option value="768x1024" data-page-node-id="PN0uVa5SlIN1s9tNTK2q03">768×1024（竖向 3:4）</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="nvgd3A5UHuIb4OSQOXsx5N">
+            <label class="field-label" data-page-node-id="4h5cdRnkAMpCIcIwqSH20N">输出格式</label>
+            <select id="image-format" data-page-node-id="QUltf14rcFtll7Okgu7B65">
+              <option value="url" selected data-page-node-id="YAt7qLOTNVsI2rbdmQOTu9">URL</option>
+              <option value="b64_json" data-page-node-id="DCF7wunySMbE1rSRZ3vkD6">Base64</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" data-page-node-id="GIDwzJVglWencFFcYDJgvu">
+          <label class="field-label" data-page-node-id="U2pBIDbtLf4S2UK64SthSP">Prompt（提示词）</label>
+          <textarea id="image-prompt" placeholder="描述你想生成的图片...">A luminous floating city above a misty canyon at sunrise, cinematic realism, volumetric lighting, highly detailed, 8K</textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label">🎲 随机种子（可选）</label>
+            <input type="number" id="image-seed" placeholder="留空随机" min="0" max="4294967295" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+          </div>
+          <div class="form-group">
+            <label class="field-label">📌 提示</label>
+            <div style="padding:10px;background:#f0f7ff;border-radius:6px;font-size:13px;color:#555;">
+              ℹ️ 图片生成 API 不支持 Negative Prompt，如需控制输出请使用正面提示词详细描述
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateImage()" data-page-node-id="fMyEGRl9H8dzPl2c9GfcUR">🎨 生成图片</button>
+      </div>
+      <div class="output-area" id="image-output" data-page-node-id="cSiVZGL8aIcjlGqxURtPTq">等待生成...</div>
+    </section>
+
+    <!-- ========== Video V2.5 Flash ========== -->
+    <section id="video" class="section" data-page-node-id="ZdDODaBHDjj7tUzbkcMt9t">
+      <h2 data-page-node-id="wuKKiDRAKoPw0koupl54C3">🎬 文生视频</h2>
+      <div class="card" data-page-node-id="Skdcoo9odKEef3Pvlp70yn">
+        <div class="card-title" data-page-node-id="Y1aKkiPByMP0b87reiS7JM">配置（V2.5 Flash - 限时免费）</div>
+        <div class="form-row" data-page-node-id="JxnoiMEQJD1mEV8GEY338M">
+          <div class="form-group" data-page-node-id="9oTLWCOilaWdVrVm1sWt7w">
+            <label class="field-label" data-page-node-id="5BcDKwy67t1TcszVg10YTL">模型</label>
+            <select id="video-model" data-page-node-id="1fFIXvoofrSOSwBYwKr7rA" onchange="applyModelSwitch('video')">
+              <option value="agnes-video-2.5-flash" selected data-page-node-id="3uzhZ6nOWMuqopJemvTOkh">agnes-video-2.5-flash（推荐，限时免费）</option>
+              <option value="agnes-video-2.5" data-page-node-id="XyzAbc123">agnes-video-2.5（付费，高清多档）</option>
+              <option value="agnes-video-v2.0" data-page-node-id="HN0UCYECataegBGN5MwBmw">agnes-video-v2.0（旧版异步）</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="kz70zACdB2adPwSv9okGe7">
+            <label class="field-label" data-page-node-id="dCpzeXc0ObgoiAI6DwbIaZ">比例</label>
+            <select id="video-ratio" data-page-node-id="WdUbqKdwscBrAuiVbrVTCi">
+              <option value="16:9" selected data-page-node-id="4LhszA27Ev8VptSaT7PeJK">16:9 横屏</option>
+              <option value="9:16" data-page-node-id="10NCLQKamD9bBV9v3FMIGJ">9:16 竖屏</option>
+              <option value="1:1" data-page-node-id="JJsjXpYUH7QlvFxN0bpNJC">1:1 方形</option>
+              <option value="4:3" data-page-node-id="Uc6GcQF1z7FMHNlR5ygLgn">4:3 标准</option>
+              <option value="3:4" data-page-node-id="d2bE5Urlt0b11Nsbe15TU8">3:4 竖版</option>
+              <option value="21:9" data-page-node-id="21_9">21:9 超宽屏</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="video-dynamic-row" data-page-node-id="T1zLOcKyyfX7stq0UtuPOS">
+          <!-- Dynamic row filled by JS based on model selection -->
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label class="field-label">⏱️ 视频时长（秒）</label>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <input type="range" id="video-duration-slider" min="4" max="12" value="5" step="1" style="flex:1;" oninput="document.getElementById('video-duration-label').textContent=this.value+' 秒'">
+            <span id="video-duration-label" style="min-width:60px;text-align:center;font-weight:bold;color:var(--accent);">5 秒</span>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-group">
+            <label class="field-label">🎲 随机种子（可选，用于复现结果）</label>
+            <input type="number" id="video-seed" placeholder="留空则随机" min="0" max="4294967295" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+          </div>
+          <div class="form-group">
+            <label class="field-label">📝 生成模式</label>
+            <select id="video-mode" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+              <option value="text" selected>Text（纯文本生成）</option>
+              <option value="keyframe">Keyframe（首尾帧控制）</option>
+              <option value="reference">Reference（图片/音频参考）</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" data-page-node-id="pgLFC4tirzKOnKGkSHjFzs">
+          <label class="field-label" data-page-node-id="I3RgoTLH3EaEHKVsNaozxi">Prompt（提示词）</label>
+          <textarea id="video-prompt" placeholder="描述你想要的视频内容...">A cinematic shot of a golden retriever running on a beach at sunset, waves crashing, warm golden light, slow motion, 4K quality</textarea>
+        </div>
+        <div class="form-group" data-page-node-id="tsFgumqCB5WEGy9oZEQGpw">
+          <label class="field-label" data-page-node-id="fxc4aeRYIDwNynWin659TQ">Negative Prompt（可选）</label>
+          <input type="text" id="video-negative" placeholder="不想出现的元素" data-page-node-id="o4yQZUmOFB3ILAzDIssXTw">
+        </div>
+        <button class="btn btn-primary" onclick="generateVideo()" data-page-node-id="fioJjdSeDCIiA4AOEGPxnk">🎬 生成视频</button>
+      </div>
+      <div id="video-status" data-page-node-id="054Bm6JF5wlvKi9BgEWjFQ"></div>
+      <div class="output-area" id="video-output" data-page-node-id="h1L38pu7lKGfn8ETXeuLk9">等待生成...</div>
+    </section>
+
+    <!-- ========== Prompt: Image ========== -->
+    <section id="prompt-image" class="section" data-page-node-id="7uDr4zkJ7oEUGnygMwmpHt">
+      <h2 data-page-node-id="p3e6sA6HBhBHdEj4Eo13mp">✨ 文生图提示词生成器</h2>
+      <div class="alert alert-info" data-page-node-id="6lEfvebCVMUW1Ik5t5juo9">
+        输入你想要生成图片的简单描述，AI 会帮你生成专业的高质量英文提示词。
+      </div>
+      <div class="card" data-page-node-id="jQAkPAvCUCfyjEsrS2SvTO">
+        <div class="card-title" data-page-node-id="qjUBBksFknyFpsx1QRHuoh">你的需求</div>
+        <div class="form-group" data-page-node-id="UBYzzqepsMa9lJjkDAfmKu">
+          <label class="field-label" data-page-node-id="nF4bm7UZtOcI7lB0ryA61w">简单描述（中文/英文均可）</label>
+          <textarea id="prompt-image-input" placeholder="例如：一只在太空飘浮的猫咪，穿着宇航服，背景是地球"></textarea>
+        </div>
+        <div class="form-row" data-page-node-id="2V1lBoLAEESkoY97vLSVNB">
+          <div class="form-group" data-page-node-id="AStV8299jV4913mjc99hZ3">
+            <label class="field-label" data-page-node-id="sEpugmvRVBvijPmKWM3r90">风格</label>
+            <select id="prompt-image-style" data-page-node-id="WRFs6Ck1SN4cv309MH86aH">
+              <option value="" data-page-node-id="7j28wXDL7hhbRr0capfN4I">不指定（由 AI 自由发挥）</option>
+              <option value="cinematic" data-page-node-id="rNvD1uhnvUN0mu2B0JZvUx">电影感</option>
+              <option value="photorealistic" data-page-node-id="4j5HxQaMLpmKkoL00Xn6b1">写实摄影</option>
+              <option value="anime" data-page-node-id="YpyGAHq3C4Zhpn8uKqNErM">动漫风格</option>
+              <option value="watercolor" data-page-node-id="tmg0B8GGlDl33g9J0Uc0Rm">水彩画</option>
+              <option value="oil-painting" data-page-node-id="qHBlfxwpsMcFuNApgh81fU">油画</option>
+              <option value="3d-render" data-page-node-id="9SPn02oWFozk4nfmxwvaFI">3D 渲染</option>
+              <option value="pixel-art" data-page-node-id="4r1bQmJGuGnIT5lajeVvR3">像素艺术</option>
+              <option value="minimalist" data-page-node-id="2VuJI697HxyRsW8dScHUMk">极简主义</option>
+              <option value="cyberpunk" data-page-node-id="7anRYs5ifYU2ScnQpvwUcA">赛博朋克</option>
+              <option value="fantasy" data-page-node-id="aHcgJegcqivCCSBZsLWPsJ">奇幻</option>
+              <option value="pop-art" data-page-node-id="DwAgeAfPTXDO9DXjXy0Wwk">波普艺术</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="OjrlpZ4wC4pgx37DlzKfZk">
+            <label class="field-label" data-page-node-id="n7Bz0T5iOXgEkZfODCDx9l">比例</label>
+            <select id="prompt-image-size" data-page-node-id="0CzrrFGNaOyaPjJuZXDRka">
+              <option value="1:1">1:1 方形（1024×1024）</option>
+              <option value="4:3">4:3 横向（1024×768）</option>
+              <option value="16:9">16:9 宽屏（1344×768）</option>
+              <option value="9:16">9:16 竖屏（768×1344）</option>
+              <option value="3:4">3:4 竖向（768×1024）</option>
+              <option value="21:9">21:9 超宽屏（1536×640）</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateImagePrompt()" data-page-node-id="VGtsLjp49pL1C63hMBevt5">✨ 生成提示词</button>
+      </div>
+      <div class="form-group" style="margin-top:12px;">
+        <label class="field-label">🚫 负面提示词（可选，AI 会自动建议）</label>
+        <input type="text" id="prompt-image-negative" placeholder="如：blurry, bad quality, distorted, watermark...">
+      </div>
+      <div class="output-area" id="prompt-image-output" data-page-node-id="JTgpiP8MeXdh0FyGEFx8fi">等待生成...</div>
+      <div class="card" id="prompt-image-result" style="display:none;" data-page-node-id="ag1nowWZ9Vkrxg3pmL8EtI">
+        <div class="card-title" data-page-node-id="iDmvBttzEpUGv3o3yjBTzp">🎯 正面提示词 <button class="copy-btn" onclick="copyFromArea('prompt-image-positive-text')" data-page-node-id="JBZzIaY83WYSxkJEw7Q0gP">复制</button></div>
+        <div id="prompt-image-positive-text" data-page-node-id="3lcbWB6lvdBho0mkkYcHeD"></div>
+      </div>
+      <div class="card" id="prompt-image-negative-result" style="display:none;" data-page-node-id="neg-res-123">
+        <div class="card-title" data-page-node-id="neg-res-title">🚫 负面提示词 <button class="copy-btn" onclick="copyFromArea('prompt-image-negative-text')" data-page-node-id="neg-copy-btn">复制</button></div>
+        <div id="prompt-image-negative-text" data-page-node-id="neg-res-text"></div>
+      </div>
+      <div class="card" id="prompt-image-meta" style="display:none;" data-page-node-id="meta-123">
+        <div class="card-title" data-page-node-id="meta-title">📋 生成参数</div>
+        <div id="prompt-image-meta-text" data-page-node-id="meta-text"></div>
+      </div>
+      <h3 data-page-node-id="Emuici4yY3xEIY00kc745f">📋 常用提示词模板</h3>
+      <div class="prompt-template" onclick="useTemplate('image','product')" data-page-node-id="kNByjm2EPsgQEQvk4UZI0z">
+        <div class="pt-title" data-page-node-id="r3kqNBhM7HEiAWh4CFxsSf">🛍️ 电商产品图</div>
+        <div class="pt-desc" data-page-node-id="JLcfj4cenEVGB14JrL2BLg">干净的产品展示，专业商业摄影</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('image','poster')" data-page-node-id="XgVBaFsKUmluxprHaewF3t">
+        <div class="pt-title" data-page-node-id="ZoGCLw5BGXpuoCapv2Tll7">📱 社交媒体海报</div>
+        <div class="pt-desc" data-page-node-id="izf65D5J7KsvQgpExuw6bu">鲜艳的社交媒体宣传图</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('image','portrait')" data-page-node-id="0eIZvEFvBkCvBVCcpAtuun">
+        <div class="pt-title" data-page-node-id="e1Ljar5dqFh780ifKq49N0">👤 人物肖像</div>
+        <div class="pt-desc" data-page-node-id="ks8luCnavgybI7MUDFBGug">专业的人物摄影肖像</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('image','landscape')" data-page-node-id="kCDlZRjR48kytywZxflqIa">
+        <div class="pt-title" data-page-node-id="aZI3bcDcOHcUdmshoqre7w">🏔️ 风景场景</div>
+        <div class="pt-desc" data-page-node-id="32u42YhZYum4T7SxkR95ld">震撼的风景摄影</div>
+      </div>
+    </section>
+
+    <!-- ========== Prompt: Video ========== -->
+    <section id="prompt-video" class="section" data-page-node-id="klUNdSaL3bv9g4djBVhYWF">
+      <h2 data-page-node-id="aHHWhdyspQxU2vvCupgjPJ">✨ 文生视频提示词生成器</h2>
+      <div class="alert alert-info" data-page-node-id="WjxnhzGXo60ig6VPQp1AP2">
+        输入你想要生成视频的简单描述，AI 会帮你生成高质量的专业英文视频提示词。
+      </div>
+      <div class="card" data-page-node-id="ENz4GZJsYC5d19ZvUopy0U">
+        <div class="card-title" data-page-node-id="7K6TS9uUHU29LKTK5klVqa">你的需求</div>
+        <div class="form-group" data-page-node-id="h3wG5Yag5yZh4zLDV3M1rg">
+          <label class="field-label" data-page-node-id="fvmQovRvpYFRbAMpLQ8dqH">简单描述（中文/英文均可）</label>
+          <textarea id="prompt-video-input" placeholder="例如：一只狗在海滩上奔跑，夕阳西下"></textarea>
+        </div>
+        <div class="form-row" data-page-node-id="mzcAnoOA1AcYEDyhu0c3T7">
+          <div class="form-group" data-page-node-id="EEhJ7UPtTBjKXfmCNrRuGv">
+            <label class="field-label" data-page-node-id="PXpmOWhu0hrxnPsihpwf4k">风格</label>
+            <select id="prompt-video-style" data-page-node-id="PuuBDMCt8i3JayiMaWyAoo">
+              <option value="" data-page-node-id="QSE1woGlAIAnixH6HCNs3G">不指定</option>
+              <option value="cinematic" data-page-node-id="7hJ5t0QFyvXN9b8Ljc8a7F">电影感</option>
+              <option value="realistic" data-page-node-id="fQ5i5S1C8d5wYBY7xFfhxN">写实</option>
+              <option value="anime" data-page-node-id="yAtfFo0XHDGPb9YJqbiowd">动漫</option>
+              <option value="documentary" data-page-node-id="jluo4oGsZZfWYsIOeNsVXA">纪录片</option>
+              <option value="commercial" data-page-node-id="QJ36pBWf9IBahaD7k8SAxB">商业广告</option>
+              <option value="scifi" data-page-node-id="aXlCDHfdNE5GFxvm3j9YyH">科幻</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="pBIJ9FSsbdBKOH3mFCEC0Q">
+            <label class="field-label" data-page-node-id="smlcp3aRozLP93qFGcQH3H">镜头运动</label>
+            <select id="prompt-video-camera" data-page-node-id="3ncJm6gdC9ljdtsGraG3Ed">
+              <option value="" data-page-node-id="6Ozc9WWF3ehVmtOPtN1sXi">不指定</option>
+              <option value="slow tracking shot" data-page-node-id="0slSjc2tVKhfsWencKlohC">缓慢跟踪镜头</option>
+              <option value="pan right" data-page-node-id="d7r151DhGFnRPdpOgKvqrc">向右平移</option>
+              <option value="pull back" data-page-node-id="kxA6EbVHzl954MiYHhByek">拉远镜头</option>
+              <option value="push in" data-page-node-id="pushin1">推进镜头</option>
+              <option value="close up" data-page-node-id="oYbF5cucm3BEVgGAV3EC0f">特写</option>
+              <option value="aerial view" data-page-node-id="ks9mUgJBZD4QsJAGYjiy9s">航拍视角</option>
+              <option value="dolly zoom" data-page-node-id="7GHeRwoZpuWv5Y566cN9rO">希区柯克式推轨变焦</option>
+              <option value="orbit shot">环绕镜头</option>
+              <option value="handheld shake">手持晃动感</option>
+              <option value="steadicam">稳定器跟拍</option>
+              <option value="tilt up">仰角镜头</option>
+              <option value="bird's eye view">上帝视角</option>
+              <option value="low angle">低角度仰拍</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateVideoPrompt()" data-page-node-id="fLE1lKLUhMIMiGJHQHBi0p">✨ 生成提示词</button>
+      </div>
+      <div class="output-area" id="prompt-video-output" data-page-node-id="PcZfykUQVJHJGsVekJk6xe">等待生成...</div>
+      <div class="card" id="prompt-video-result" style="display:none;" data-page-node-id="qc4JboSyP6fGlrHUbEmGn7">
+        <div class="card-title" data-page-node-id="jFuoZ2slaBLqXl3WZ5jAYX">🎯 正面提示词 <button class="copy-btn" onclick="copyFromArea('prompt-video-positive-text')" data-page-node-id="mKvOkITIgqF8kVFxD25HRu">复制</button></div>
+        <div id="prompt-video-positive-text" data-page-node-id="ns5wPGCICRwd7CsiAtaBlv"></div>
+      </div>
+      <div class="card" id="prompt-video-negative-result" style="display:none;" data-page-node-id="vid-neg-123">
+        <div class="card-title" data-page-node-id="vid-neg-title">🚫 负面提示词 <button class="copy-btn" onclick="copyFromArea('prompt-video-negative-text')" data-page-node-id="vid-neg-copy">复制</button></div>
+        <div id="prompt-video-negative-text" data-page-node-id="vid-neg-text"></div>
+      </div>
+      <div class="card" id="prompt-video-meta" style="display:none;" data-page-node-id="vid-meta-123">
+        <div class="card-title" data-page-node-id="vid-meta-title">📋 建议参数</div>
+        <div id="prompt-video-meta-text" data-page-node-id="vid-meta-text"></div>
+      </div>
+      <h3 data-page-node-id="5ImTYQ2669q4lDc0S0gL7P">📋 常用提示词模板</h3>
+      <div class="prompt-template" onclick="useTemplate('video','product')" data-page-node-id="PJxH4YfSwUUnzcihfWHJHu">
+        <div class="pt-title" data-page-node-id="1ZhgEXfaV8K00mQFdLIdCf">🛍️ 产品展示视频</div>
+        <div class="pt-desc" data-page-node-id="Buj7rfJ16dillzNkw6Ni0n">360度产品展示，柔和灯光</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('video','character')" data-page-node-id="Fdhn8TzZOcBx81yJ5nmqbu">
+        <div class="pt-title" data-page-node-id="hrFkfd3DUoVOxSdcYpRKnl">🏃 人物动作视频</div>
+        <div class="pt-desc" data-page-node-id="NqcyJW4vtKvHED0ZuDBckS">自然的人物动作和场景</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('video','nature')" data-page-node-id="nature123">
+        <div class="pt-title" data-page-node-id="natureTitle">🌄 自然风光延时</div>
+        <div class="pt-desc" data-page-node-id="natureDesc">延时摄影记录自然景色变化，壮观的视觉效果</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('video','food')" data-page-node-id="food123">
+        <div class="pt-title" data-page-node-id="foodTitle">🍽️ 美食制作视频</div>
+        <div class="pt-desc" data-page-node-id="foodDesc">美食特写镜头，蒸汽腾腾，厨师双手入镜</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('video','transition')" data-page-node-id="trans123">
+        <div class="pt-title" data-page-node-id="transTitle">🔄 转场特效</div>
+        <div class="pt-desc" data-page-node-id="transDesc">电影级场景过渡，视觉连贯</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('video','sports')" data-page-node-id="sports123">
+        <div class="pt-title" data-page-node-id="sportsTitle">⚽ 运动慢动作</div>
+        <div class="pt-desc" data-page-node-id="sportsDesc">精彩运动瞬间，慢动作回放</div>
+      </div>
+      <div class="prompt-template" onclick="useTemplate('video','city')" data-page-node-id="city123">
+        <div class="pt-title" data-page-node-id="cityTitle">🏙️ 城市风光</div>
+        <div class="pt-desc" data-page-node-id="cityDesc">城市天际线、车流光影、延时摄影</div>
+      </div>
+    </section>
+
+    <!-- ========== Image-to-Image ========== -->
+    <section id="img2img" class="section" data-page-node-id="p8v5A36Ii1awZI4Sw3DN5F">
+      <h2 data-page-node-id="XtREnMTquBEo7COOmibuL8">🎨 图生图</h2>
+      <div class="alert alert-info" data-page-node-id="X5acXy5EoU2KZ7t5br9Omm">
+        上传一张图片并提供编辑指令，AI 将基于原图生成修改后的图片。图片必须为公网可访问的 URL。
+        <br data-page-node-id="E0LjEoVq6IdC02gYPPy9FZ"><strong data-page-node-id="GeG86fVXBG4tvcA9HZ4pmh">注意：</strong>图片 URL 需放在 <code class="code-inline" data-page-node-id="dx3BSDzIgtVu5mmLiEWKgQ">extra_body.image</code> 中，不能放顶层。
+        <br data-page-node-id="3pLim3YETgK9yaSzs9LD05"><strong data-page-node-id="9zPB6sPryPJ7hiueK2Z8cq">注意：</strong><code class="code-inline" data-page-node-id="GKBBOh95veqkQYrV1JYAts">response_format</code> 也须放在 <code class="code-inline" data-page-node-id="c6lCDEjKnG76FctVhzFfTJ">extra_body</code> 中。
+      </div>
+      <div class="card" data-page-node-id="F5kZbP7oDvXzSAKkU2bZbk">
+        <div class="card-title" data-page-node-id="KYlFs6E6Bh2OLRvsmM6IYO">配置</div>
+        <div class="form-row" data-page-node-id="JkxTwaLwiiVTPLIbfeMSzp">
+          <div class="form-group" data-page-node-id="sJQjmK2mlH8bRBdjTa2DDf">
+            <label class="field-label" data-page-node-id="LCL65llHGZRhhAR8akv06f">模型</label>
+            <select id="img2img-model" data-page-node-id="gC4Ejex00GEJHlePLXcEAL">
+              <option value="agnes-image-2.1-flash" selected data-page-node-id="pIWaGryvFUjxUXodueARKP">agnes-image-2.1-flash（推荐）</option>
+              <option value="agnes-image-2.0-flash" data-page-node-id="vxKL1MwDpE30JDvCY8QmrV">agnes-image-2.0-flash</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="GvOX2CCq8F24GTfDlJfXmZ">
+            <label class="field-label" data-page-node-id="Xsw1d1SE4ajYXu2Bxz1GV1">尺寸</label>
+            <select id="img2img-size" data-page-node-id="25JL50FXyHpImTdwXna6pA">
+              <option value="1024x1024" selected data-page-node-id="nzPIsOzoHqQlLayhzXpyNg">1024×1024</option>
+              <option value="1024x768" data-page-node-id="7QpXlmp7gbAFAAvqDUYIyq">1024×768</option>
+              <option value="768x1024" data-page-node-id="z40fNdJKxBsqKFVHCZLvOE">768×1024</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="VgJNYHbnTUlRUXRTRY5u4A">
+            <label class="field-label" data-page-node-id="5kVJ2krOcpDgiVyCLBk8NK">输出格式</label>
+            <select id="img2img-format" data-page-node-id="SSVF0QtaVZbvosJo0HFJZP">
+              <option value="url" selected data-page-node-id="r5h3J7PI3kffVIRBcRClnC">URL</option>
+              <option value="b64_json" data-page-node-id="zFdaZ86oNs4dbrmNW0M658">Base64</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" data-page-node-id="OioRwZzEqicmERcb8MxRTd">
+          <label class="field-label" data-page-node-id="GnCSLvrHFXZU2PHFhmTKr5">原图 URL（公网可访问）</label>
+          <input type="text" id="img2img-image" placeholder="https://example.com/image.png" data-page-node-id="TF3vW7XOqWowERscaUBCHH">
+        </div>
+        <div class="form-group" data-page-node-id="HGgHNNJd3uVrZE1H1XtGIH">
+          <label class="field-label" data-page-node-id="iI22jfwSqXK7SPpa6yUMNW">编辑指令 Prompt</label>
+          <textarea id="img2img-prompt" placeholder="描述你想如何修改这张图片..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="field-label">🎲 随机种子（可选）</label>
+            <input type="number" id="img2img-seed" placeholder="留空随机" min="0" max="4294967295" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+          </div>
+          <div class="form-group">
+            <label class="field-label">📌 提示</label>
+            <div style="padding:10px;background:#f0f7ff;border-radius:6px;font-size:13px;color:#555;">
+              ℹ️ 图片生成 API 不支持 Negative Prompt，建议使用正面提示词详细说明期望结果
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateImg2Img()" data-page-node-id="QhVaPYME2F0djrrp26moFQ">🎨 生成图片</button>
+      </div>
+      <div class="output-area" id="img2img-output" data-page-node-id="BmyEHhffMeX9dEf1e40Jyw">等待生成...</div>
+      <h3 data-page-node-id="5KHcglNtMA2qBUoosYDR5L">📋 编辑指令模板</h3>
+      <div class="prompt-template" onclick="useImg2ImgTemplate('style')" data-page-node-id="2ysR3uiycfYUJdNzJJDfpb">
+        <div class="pt-title" data-page-node-id="YTbRKeZ9WyvHmO0T3XmyRM">🎭 风格转换</div>
+        <div class="pt-desc" data-page-node-id="Dabytx38fs74yHYdMjpXQO">Transform this image into [target style] style while preserving the main subject</div>
+      </div>
+      <div class="prompt-template" onclick="useImg2ImgTemplate('color')" data-page-node-id="zcYbT8Vkx6oqiz0CaYqaNw">
+        <div class="pt-title" data-page-node-id="QWKM5AzWgykBEXqwOIbBNG">🎨 颜色替换</div>
+        <div class="pt-desc" data-page-node-id="t7R31ld8w6oC9AHi92MmiI">Change the [object] color to [color] while keeping original lighting</div>
+      </div>
+      <div class="prompt-template" onclick="useImg2ImgTemplate('bg')" data-page-node-id="VXg5A0fSda8FWqEGEDAF2k">
+        <div class="pt-title" data-page-node-id="mJDBj7IfDJIRxxYjMVrCqX">🏞️ 背景替换</div>
+        <div class="pt-desc" data-page-node-id="wTjyi8PClRbayiovm0EADO">Replace the background with [new background], keep foreground unchanged</div>
+      </div>
+      <div class="prompt-template" onclick="useImg2ImgTemplate('element')" data-page-node-id="v26M3O97CNt79BnDOq6EyD">
+        <div class="pt-title" data-page-node-id="eL9d0j7947nP8ELm7x0OOq">➕ 添加元素</div>
+        <div class="pt-desc" data-page-node-id="ZR9Brp6YmWHttLRd7V6X0n">Add [elements] to the scene, maintain original style</div>
+      </div>
+    </section>
+
+    <!-- ========== Image-to-Video ========== -->
+    <section id="img2vid" class="section" data-page-node-id="slyTwS5yw26AZBSlAJJ62D">
+      <h2 data-page-node-id="a6H6tEBp8U8fJjDnX2lsO4">🖼️ 图生视频</h2>
+      <div class="alert alert-info" data-page-node-id="hmBKjYdDMy2qSaYGLGkFlS">
+        上传一张图片并描述动画效果，AI 将基于原图生成动态视频。图片必须为公网可访问的 URL。
+        <br data-page-node-id="tN93oZ9iFfbVYoU4cgPPux"><strong data-page-node-id="L0g3o3K9Bo70fE50mIhFyc">注意：</strong>图片 URL 需放在 <code class="code-inline" data-page-node-id="UeKxUV9MWIVqd9RPfO92wE">extra_body.image</code> 中。
+      </div>
+      <div class="card" data-page-node-id="A9R3pCQhxYKkCjDL0Ar3Eh">
+        <div class="card-title" data-page-node-id="GqS6MYtqlkdXN9t3xSNiuR">配置</div>
+        <div class="form-row" data-page-node-id="ffVFxGlkCaHAi7dXBGMwAd">
+          <div class="form-group" data-page-node-id="Q2R8UdVx451xdXvahjXGCM">
+            <label class="field-label" data-page-node-id="K8MHdDrmx3Oj4SMUxKoDBZ">模型</label>
+            <select id="img2vid-model" data-page-node-id="gS3WVFNVYRNFX5zDAJ0h9V">
+              <option value="agnes-video-2.5-flash" selected data-page-node-id="h7xOAKkSPBGXOEZbxZGDrM">agnes-video-2.5-flash（推荐）</option>
+              <option value="agnes-video-v2.0" data-page-node-id="6EmEAE7r9yxlY9E9vZTCUD">agnes-video-v2.0（旧版）</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="B8TcQhWWIz08axW15VWH12">
+            <label class="field-label" data-page-node-id="bRmIGkRF0CVmOWBE7GUZz5">比例</label>
+            <select id="img2vid-ratio" data-page-node-id="CWwsZXTHZdXBzzqgEwEd3A">
+              <option value="16:9" selected data-page-node-id="8AV2fi7gtXLfXvabt3lxpz">16:9 横屏</option>
+              <option value="9:16" data-page-node-id="7ojZ9IR8OJRTcVrNbo1xaY">9:16 竖屏</option>
+              <option value="1:1" data-page-node-id="ERNgyULIMGD85OfHjqagrX">1:1 方形</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="img2vid-dynamic-row" data-page-node-id="nGto8r7TNBaDrtQBD3GmdJ"></div>
+        <div class="form-group" data-page-node-id="KMMNYUZbPw30LEacXRQcAJ">
+          <label class="field-label" data-page-node-id="09SalJxdx9p4dSIGkwJGTE">原图 URL（公网可访问）</label>
+          <input type="text" id="img2vid-image" placeholder="https://example.com/image.png" data-page-node-id="JEZNzCRgeeIl4AB5COToAQ">
+        </div>
+        <div class="form-group" data-page-node-id="npOQXxexc5zxjI3RxyvdMk">
+          <label class="field-label" data-page-node-id="eCmr9gc2KD75wfQaHQGWKF">动画描述 Prompt</label>
+          <textarea id="img2vid-prompt" placeholder="描述图片应该如何动起来..."></textarea>
+        </div>
+        <div class="form-group" data-page-node-id="eFag4Fp62ulEV4HLCvrc8e">
+          <label class="field-label" data-page-node-id="kEagd3LAqTLXkqAswxUMI0">Negative Prompt（可选）</label>
+          <input type="text" id="img2vid-negative" placeholder="不想出现的元素" data-page-node-id="YsxYxHlrFnQz3AOEXCRH0r">
+        </div>
+        <button class="btn btn-primary" onclick="generateImg2Vid()" data-page-node-id="ogzK9EpgcBCYy8YUxvKTc4">🎬 生成视频</button>
+      </div>
+      <div id="img2vid-status" data-page-node-id="eUU5lHgmy2Pp7ejxVKPzSf"></div>
+      <div class="output-area" id="img2vid-output" data-page-node-id="sEHvmqPgiKk3NlDekZoYjJ">等待生成...</div>
+    </section>
+
+    <!-- ========== Keyframes Video ========== -->
+    <section id="keyframes" class="section" data-page-node-id="WSeMeOsxn0HjW1vBsGf80G">
+      <h2 data-page-node-id="0oZQvFSqvP3GI43FWnnviK">🎞️ 多图/关键帧视频</h2>
+      <div class="alert alert-info" data-page-node-id="v3crC2gmsNgazRZtdXTRCl">
+        上传多张关键帧图片（至少 2 张），AI 将生成图片之间的流畅过渡动画视频。
+        使用 <code class="code-inline" data-page-node-id="za2Fo5gSrlzAXU3kKQsjk6">mode: keyframes</code> 模式，图片须放在 <code class="code-inline" data-page-node-id="Hdx7dDnNJJxOAPtBuNctsR">extra_body.image</code>。
+      </div>
+      <div class="card" data-page-node-id="geLH25NeyiTHKEo0kJiUb3">
+        <div class="card-title" data-page-node-id="Zo1zrRZlhK8grkkbpJ49fC">配置</div>
+        <div class="form-row" data-page-node-id="qWrAzc0VshC1cgBnFWa01H">
+          <div class="form-group" data-page-node-id="DpmBqOoQu0E2TSPFGXcDsH">
+            <label class="field-label" data-page-node-id="g5Dl0Vvnlhza6Kvdr9LLM5">模型</label>
+            <select id="keyframes-model" data-page-node-id="lauK4BlCPicHBZkUXFQ0TK" onchange="applyModelSwitch('keyframes')">
+              <option value="agnes-video-2.5-flash" selected data-page-node-id="uwxd1ZEVHaiSz9WwbX8EKl">agnes-video-2.5-flash（推荐）</option>
+              <option value="agnes-video-2.5" data-page-node-id="Def789">agnes-video-2.5（付费，高清多档）</option>
+              <option value="agnes-video-v2.0" data-page-node-id="OqeSqZMPoK2BcfmrsWfc63">agnes-video-v2.0（旧版）</option>
+            </select>
+          </div>
+          <div class="form-group" data-page-node-id="yoLc6OCFVPznpz1H3ocFcB">
+            <label class="field-label" data-page-node-id="cHnWg7HrphsZTcGOeXEWUf">比例</label>
+            <select id="keyframes-ratio" data-page-node-id="9Y4UWY16AYBikEeUR2RWep">
+              <option value="16:9" selected data-page-node-id="mnRcgL9r0uM0qcV7UK5i2Z">16:9 横屏</option>
+              <option value="9:16" data-page-node-id="QGJwBxY3gB9dr7AwzMOenp">9:16 竖屏</option>
+              <option value="1:1" data-page-node-id="x1T0vT0g3xJr1xoqJCGuZ4">1:1 方形</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="keyframes-dynamic-row" data-page-node-id="w7mZQORX8wZjDmPxpKWKeW"></div>
+        <div class="form-group" data-page-node-id="q0Bl5iATIXXoqnsHUECftL">
+          <label class="field-label" data-page-node-id="B0hPxlVXTvddksVFWl4dvU">关键帧图片 URL（每行一个，至少 2 张）</label>
+          <textarea id="keyframes-images" rows="4" placeholder="https://example.com/frame1.png&#10;https://example.com/frame2.png&#10;https://example.com/frame3.png"></textarea>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;" data-page-node-id="HAsbmHBj1fY15zPb0mFWB5">每张图一行，确保 URL 公网可访问</div>
+        </div>
+        <div class="form-group" data-page-node-id="i43FLqbdz9CLP4zQNpkxr3">
+          <label class="field-label" data-page-node-id="1kdVqyQBBIswfzAsEUrJfV">过渡描述 Prompt</label>
+          <textarea id="keyframes-prompt" placeholder="描述图片之间应该如何过渡..."></textarea>
+        </div>
+        <div class="form-group" data-page-node-id="ajw9qgczjmAojtRF6U3Sk5">
+          <label class="field-label" data-page-node-id="XBPGrlbblGPEc8hEq6R7wm">Negative Prompt（可选）</label>
+          <input type="text" id="keyframes-negative" placeholder="不想出现的元素" data-page-node-id="gKYVtRxvCjMq589Y8xkoVa">
+        </div>
+        <button class="btn btn-primary" onclick="generateKeyframesVid()" data-page-node-id="f6T0cn6O9BpJz1jMAAepyC">🎞️ 生成关键帧视频</button>
+      </div>
+      <div id="keyframes-status" data-page-node-id="8JX0uPnfsM1IqIWFZPsIa8"></div>
+      <div class="output-area" id="keyframes-output" data-page-node-id="aRfPbIGqOzdVZH8PHtNII3">等待生成...</div>
+    </section>
+
+    <!-- ========== History ========== -->
+    <section id="history" class="section" data-page-node-id="RN9bFMRHurwv55OeG0UD9s">
+      <h2 data-page-node-id="A6ghk2oe6g78nb82uPjDPd">📜 历史记录</h2>
+      <div class="alert alert-info" id="history-empty" data-page-node-id="KE1U4IES6mSklMxqpNHRfb">暂无历史记录。完成一次对话、生成图片或视频后会显示在这里。</div>
+      <div class="card" id="history-list" style="display:none;" data-page-node-id="KjPyeWEcUpUo9MaOldJRbw"></div>
+      <div style="margin-top:10px;" data-page-node-id="2YeZ9TXI9DbHhlh8TWrx2H">
+        <button class="btn btn-danger btn-sm" onclick="clearHistory()" data-page-node-id="cRoyYicDMulyvojA9q2o7t">🗑️ 清空历史</button>
+      </div>
+    </section>
+
+    <!-- ========== Models ========== -->
+    <section id="models" class="section" data-page-node-id="GBbUnrmgGn3xR4IDs7WNge">
+      <h2 data-page-node-id="SM7ryRmnA0WtbrvJyXxhlV">📋 模型速查表</h2>
+      <div class="card" data-page-node-id="nfxOBBVN26LQFXCjHz0Wu9">
+        <div class="card-title" data-page-node-id="kWeTnGIIaJU0M1m0FcK5Tf">文本模型</div>
+        <table data-page-node-id="U1vvretVyYekB7EUTbsHxl">
+          <tr data-page-node-id="26kzQcD3gUasC5XotcpxwD"><th data-page-node-id="SLChLzkByJBjEeQVflUPXW">模型名</th><th data-page-node-id="5DSGChnFZyiSwuymeuEZN8">上下文</th><th data-page-node-id="tYomT2dGAHCtDyDV7VQR7O">最大输出</th><th data-page-node-id="vcFCssLuUaoS1G99IzoGIF">状态</th><th data-page-node-id="RNlchplWhFXvaMYoxkdFOw">价格</th><th data-page-node-id="JHQFrrSzfL3eONvZIqHS05">RPM</th></tr>
+          <tr data-page-node-id="d5j0ZQVCVtlYyKDBs6khCG"><td data-page-node-id="m8TAzIQmP0AnZE79Iq6N1k"><code class="code-inline" data-page-node-id="W3tIXFTfvxxUCdmBtT4hHv">agnes-2.5-flash</code></td><td data-page-node-id="DU6ZxVoIqIn64c2DwRhZuR">512K</td><td data-page-node-id="DDOhYdnmtJdIrBJDEdJulp">65,536</td><td data-page-node-id="ODBuHH0IwrHSIOociwQJGR"><span class="badge badge-green" data-page-node-id="1ONAfZwIGR0cnjSFgx8BMs">免费</span></td><td data-page-node-id="fv7aGbImKGPeID7NAl1ORr">$0</td><td data-page-node-id="NQi3nE0OLUpGjR45JxLaNb">20</td></tr>
+          <tr data-page-node-id="nOpvkzWpe7XqBVBZH0763K"><td data-page-node-id="xol7U9DkiBpjs0xM6dVhWr"><code class="code-inline" data-page-node-id="DVP4bJ0VjET634O19jxZaJ">agnes-2.0-flash</code></td><td data-page-node-id="hZum7jM76Fx7iPyGVFDFC9">512K</td><td data-page-node-id="RELlOmlwLVnDWLwdtzpel6">64K</td><td data-page-node-id="eqD5Rn6jhwEgC28dWYUHDc"><span class="badge badge-green" data-page-node-id="G6jQbInXZHG2EWljd6iudh">免费</span></td><td data-page-node-id="dmW1tiMpab9AbkdULa3rVz">$0</td><td data-page-node-id="WZCX2tCaroGANGjziBWOeg">20</td></tr>
+          <tr data-page-node-id="rW2cGrBdR3h7jiYEEns1qn"><td data-page-node-id="GZTrhCwRFhWZwX44CGUrgq"><code class="code-inline" data-page-node-id="3eoWaiSRT6bAzPKsh3FDUK">agnes-2.5-pro</code></td><td data-page-node-id="kTRdEXM8G86WJIc3XSdUf7">1M</td><td data-page-node-id="HsnKGR8pC76p9MkDw0vdYa">65,536</td><td data-page-node-id="Cuf0FnfgsQcylaEnodN3zd"><span class="badge badge-amber" data-page-node-id="sptbLfOiSu0x5ctQBZG3yZ">付费</span></td><td data-page-node-id="N5j80EOtsAPk912lpVxCEg">$0.45/$0.90/1M</td><td data-page-node-id="kEiRkm0UKMJXlM8gRm3faC">1000</td></tr>
+          <tr data-page-node-id="08URYd97WelPCfnYqkmwFT"><td data-page-node-id="BIj0CVAuhJaiP071XXsle6"><code class="code-inline" data-page-node-id="XoBkrdbgTqtlwZJP3EbhMj">agnes-2.5-pro-beta</code></td><td data-page-node-id="ezQ83FIxPvajCCHQo4HlFZ">1M</td><td data-page-node-id="ywFOsaxd1WTmW4IEm3bNUI">65,536</td><td data-page-node-id="KuOIPHSjry9doVSiyGFUgN"><span class="badge badge-amber" data-page-node-id="S9LItwIeoH9JkS4HZNUFHH">付费</span></td><td data-page-node-id="kX82NLu2H3V32Kzzq4yf4r">$0.10/$0.30/1M</td><td data-page-node-id="I523XDvOmdAGgf1oFpfKBh">1000</td></tr>
+          <tr data-page-node-id="VRSD4AM5OYGWsOaf1aidOg"><td data-page-node-id="v9m4Te4fnr41LdtwAvHCnE"><code class="code-inline" data-page-node-id="9ow0Jg5NQNjJBag4zXVtnB">agnes-2.5-pro-alpha</code></td><td data-page-node-id="JNZYnE6qSiUU5PyAUy6C36">1M</td><td data-page-node-id="4TNoOlNNnAVpYJYAfVqLCL">65,536</td><td data-page-node-id="WQs1Qr5XgYUFlmXn7p9DJf"><span class="badge badge-amber" data-page-node-id="s6DeFZ0BOM0OasVeEuQ5wj">付费/开源</span></td><td data-page-node-id="mBmhNQZH8T0SiqJUSaG5C2">$0.45/$0.90/1M</td><td data-page-node-id="aoRLWNZ7Ea5EVetwEUpBDV">1000</td></tr>
+        </table>
+      </div>
+      <div class="card" data-page-node-id="DgcHCQEitLYal3VrLeuZt1">
+        <div class="card-title" data-page-node-id="T3DEDQW4J5ClgdpypVlgCJ">图像模型</div>
+        <table data-page-node-id="ErbHGswGG3vSUdgZg6Dl28">
+          <tr data-page-node-id="uwGBScHeagDHB5pBAF3FTv"><th data-page-node-id="wHL90PFADtPRGe3JEs0Fgj">模型名</th><th data-page-node-id="7SEjSxhknkM3AMsNXDxvPZ">支持分辨率</th><th data-page-node-id="ftSBtpE5HOBS6Z9tDSXEZF">尺寸要求</th><th data-page-node-id="IsHdpTaFSymNKMeteFRTHs">状态</th><th data-page-node-id="biZTbFVqucbfx4U4Eb4tOK">价格</th><th data-page-node-id="h79lz4vAZymhyMNgU56wEF">RPM (1K)</th></tr>
+          <tr data-page-node-id="RlzJsCn58vgLVOsN39laG9"><td data-page-node-id="bAlsNbeNabTmCOB8XEwVkB"><code class="code-inline" data-page-node-id="deBMjdWj3W5eqsrqGzLg0X">agnes-image-2.1-flash</code></td><td data-page-node-id="1CbBfGpDOHaEhgGqbmoHHr">1K/2K/3K/4K</td><td data-page-node-id="L1bx6HCGJZY0VqHPhrvPtO">16 的倍数</td><td data-page-node-id="y0QcD26uXoejMyXyZ5sf2T"><span class="badge badge-green" data-page-node-id="W4HxI6llQe86cfhAEfHPon">免费</span></td><td data-page-node-id="futroE8z7qc2z9jx1hFNaL">$0</td><td data-page-node-id="cRNCEvKFfLYHxAS7Vh7FhI">20</td></tr>
+          <tr data-page-node-id="7MJLumvEFvBJMcJSkdelqt"><td data-page-node-id="FV5qXJf6A8RMq8Uf5DiB7u"><code class="code-inline" data-page-node-id="QHohxznbVqWFUVJQGbTmPs">agnes-image-2.0-flash</code></td><td data-page-node-id="ycIR2CzIirEYdvjLBvjXBn">1K/2K/3K/4K</td><td data-page-node-id="xlTUVt8vwSar0Usex2SA8m">16 的倍数</td><td data-page-node-id="I8P0hvtnpSWKFjpr5F5Ogu"><span class="badge badge-green" data-page-node-id="my9gL61leluLXsOqIHfkAw">免费</span></td><td data-page-node-id="rEqOSIRefde9PrL9gvOQQw">$0</td><td data-page-node-id="qFfUu1tK3tM7CqTl73aDb3">20</td></tr>
+        </table>
+        <div class="alert alert-warn" style="margin-top:8px;" data-page-node-id="AfyDMxutCqxqXU9x6hZaGV">
+          ⚠️ 尺寸必须是 <strong data-page-node-id="xKIa4DTqTVtp6YctleL09C">16 的倍数</strong>，否则可能返回 500 错误。<br data-page-node-id="4AZ3ahWQq3sZXHXBg2A5zX">
+          📐 1K：1024×768 / 1024×1024 / 768×1024 &nbsp;|&nbsp; 2K：2048×2048 / 2048×1536 / 1536×2048<br data-page-node-id="nyTGtvO7lTgS36eM6Zp7Os">
+          3K/4K：RPM = 1，需要较长时间等待。
+        </div>
+      </div>
+      <div class="card" data-page-node-id="Eh78zqZwpKkD2tEg7bODWe">
+        <div class="card-title" data-page-node-id="jGXqZltppUSjcGvNXEg3tW">视频模型</div>
+        <table data-page-node-id="IZguMAo4wnh66Cx8tFeqkV">
+          <tr data-page-node-id="DpRXPaSoa0ThrYQbPHc4ER"><th data-page-node-id="gl2zxy0J097GehRT78YubN">模型名</th><th data-page-node-id="iUUTFOAY8yLYXA3vIPJv1n">分辨率</th><th data-page-node-id="U3ISlPvFsnsDJJhaBABNFU">参数方式</th><th data-page-node-id="JmtDbUl7hKtmpX8dbuEGCI">时长范围</th><th data-page-node-id="CFM6KK0NuPCBkXEHgSi6e6">状态</th><th data-page-node-id="T7GpwvjFyUCF3AirAX15ci">价格</th><th data-page-node-id="WbDlIPdGFCemMIH0LHmqQ7">RPM</th></tr>
+          <tr data-page-node-id="orwDnQlA6EfrSsuB3wUIAs"><td data-page-node-id="WrLc0p6oTRej81Xwz5BIna"><code class="code-inline" data-page-node-id="XHxXiEvHtGuhTh5azunkAS">agnes-video-2.5-flash</code></td><td data-page-node-id="kWBLdJOYy9W8cEHRLXiRyB">720P</td><td data-page-node-id="B9yCMA5Abi5dC3yzsfLGeG">seconds + size</td><td data-page-node-id="SgW2v2WRE7Qihj0dLqQH6Q">4-12 秒</td><td data-page-node-id="YpkRHqs0McyACI8cqYASQ3"><span class="badge badge-green" data-page-node-id="UxT7eOjzGBzkKKGZ6G4dCW">免费</span></td><td data-page-node-id="WfAHZ8dDGzLLL1C0ltJH4e">$0</td><td data-page-node-id="rs4CkK8fHOCMSozo9hmFv6">1</td></tr>
+          <tr data-page-node-id="j2fJdJ3T1OqhsDSi6FCAbt"><td data-page-node-id="A9m5vuorLebtcWV7BdNHHa"><code class="code-inline" data-page-node-id="gHAgCFqvnx7AVRDz6p8jY6">agnes-video-v2.0</code></td><td data-page-node-id="RW2LDYltEbKXEoa1xiWiG0">480p/720p/1080p</td><td data-page-node-id="S2I6XFGUAH1C48PV0g95F9">num_frames + fps</td><td data-page-node-id="Zp1Zq9UFwok2RdgOzzpEPy">~3-18 秒</td><td data-page-node-id="ekfqQgeLgSsOuzsFMLyYEx"><span class="badge badge-green" data-page-node-id="SovCyRmcytyVDGf07zAhts">免费</span></td><td data-page-node-id="Jx4w3gXT8N84Zm4LIfw0dW">$0</td><td data-page-node-id="gGId3dPG7BvYGG9oHB6AzE">1</td></tr>
+          <tr data-page-node-id="7bDnBaRzxBldZIh4CIKt5n"><td data-page-node-id="nI8mhkzRCFrKlg37krPmUh"><code class="code-inline" data-page-node-id="ZBximBH5xv6MIQQMbNqEiF">agnes-video-2.5</code></td><td data-page-node-id="fGKdkPDU3awhA97OmFRWf1">720P/960P/2K</td><td data-page-node-id="l5BHstEknxyOvNCXmPJUNo">seconds + size</td><td data-page-node-id="FYrhOqbHHDS1715HwfuB5V">4-12 秒</td><td data-page-node-id="T4PL6zAL3DAv3OMQpRdqhy"><span class="badge badge-amber" data-page-node-id="lsLwIGq5SG0HYfmPhu5NI0">付费</span></td><td data-page-node-id="D26I5KO5eDJUBFA0XJDP19">$0.025-0.055/s</td><td data-page-node-id="BuCAxJSQVllCbgRqEwgb0O">2</td></tr>
+        </table>
+        <div class="alert alert-info" style="margin-top:8px;" data-page-node-id="25rLsDqGU9EpY9ruQoClUW">
+          🎬 视频生成结果通过 <code class="code-inline" data-page-node-id="B7v7itX5rm186Q5Iod0PEu">GET /agnesapi?video_id=ID</code> 查询，<strong data-page-node-id="FXzGNUFAklwZVuaf1hHohv">不要用 task_id</strong>。<br data-page-node-id="FFd89UJTZtesGcN7feLppz">
+          🔄 建议轮询间隔 5 秒，排队超过 5 分钟请检查是否用错了查询接口。
+        </div>
+      </div>
+      <div class="card" data-page-node-id="tokenPlanCard">
+        <div class="card-title" data-page-node-id="tokenTitle">💰 Token Plan 订阅配额</div>
+        <table data-page-node-id="tokenTable">
+          <tr><th>Plan</th><th>文本请求(每5小时)</th><th>图片(每天)</th><th>视频(每天)</th></tr>
+          <tr><td>Starter</td><td>1,500 次</td><td>4,000 张</td><td>500 秒</td></tr>
+          <tr><td>Plus</td><td>7,500 次</td><td>4,000 张</td><td>500 秒</td></tr>
+          <tr><td>Pro</td><td>30,000 次</td><td>4,000 张</td><td>500 秒</td></tr>
+        </table>
+        <div class="alert alert-warn" style="margin-top:8px;">
+          ⚠️ RPM限制与订阅配额同时生效（如Pro文本1000 RPM仍受每5小时3万次约束）。超额触发429。
+        </div>
+      </div>
+      <div class="card" data-page-node-id="errorCodesCard">
+        <div class="card-title" data-page-node-id="errorTitle">🚨 常见错误码速查</div>
+        <table data-page-node-id="errorTable">
+          <tr><th>状态码</th><th>含义</th><th>常见原因</th><th>解决方案</th></tr>
+          <tr><td>400</td><td>请求无效</td><td>参数错误、JSON格式、尺寸非16倍数</td><td>检查格式、必填、尺寸限制</td></tr>
+          <tr><td>401</td><td>未授权</td><td>Key错误/过期</td><td>检查Authorization头</td></tr>
+          <tr><td>404</td><td>不存在</td><td>ID错误</td><td>确认ID正确</td></tr>
+          <tr><td>429</td><td>速率限制</td><td>RPM超阈/配额超标</td><td>降频、退避重试</td></tr>
+          <tr><td>500</td><td>服务器错误</td><td>参数异常(尺寸)</td><td>检查尺寸限制，重试</td></tr>
+          <tr><td>503</td><td>服务繁忙</td><td>负载高</td><td>指数退避重试(1s→2s→4s)</td></tr>
+        </table>
+        <div class="alert alert-info" style="margin-top:8px;">
+          💡 视频排队超过5分钟 → 检查是否用了task_id查询，必须改用video_id！
+        </div>
+      </div>
+      <div class="card" data-page-node-id="aN1RqoOlgA1xJ6uPuMjQG0">
+        <div class="card-title" data-page-node-id="POAuipm6wQGxyvTN0Yaa9r">📋 接入检查清单</div>
+        <div style="font-size:13px;line-height:2;" data-page-node-id="b1cSwBIkwmet2gua05htTW">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="T242t0269PcU8FxNpsrZKJ"><input type="checkbox" data-page-node-id="U8TfOE6pHaRrMRfDNW4IGI"> API Key 已创建（platform.agnes-ai.com）</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="dEED56SY1BelMvNh4h71Gy"><input type="checkbox" data-page-node-id="k8T5xINs5mp5Lx2EAOtXkb"> Base URL 正确（国际 .com/v1 或国内 .cn/v1）</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="C03FbpmixDJUhMBjsdLTIr"><input type="checkbox" data-page-node-id="NXZcxQbrpDUSrHXyjGQadQ"> 请求头含 Authorization Bearer 和 Content-Type</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="t0UG8Hqr2gouVuHKps9LAu"><input type="checkbox" data-page-node-id="GQBIr13DRXEMD7lbAdgqsm"> 图片生成时 response_format 放在 extra_body 中</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="77E1hLH9UPDIKphLore0oQ"><input type="checkbox" data-page-node-id="8SNu0YzgHfTA2be7D1YNEy"> 图生图时 image 放在 extra_body.image 数组中</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="PDBDN9zgLZAp1A9R84ke4R"><input type="checkbox" data-page-node-id="tsop2S7KWbosNj9Rm0Zlxe"> 视频生成后使用 video_id 轮询结果（非 task_id）</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="I90zGcjpox62wD7IOj4adV"><input type="checkbox" data-page-node-id="3QEFZ3RBMVhyziNsRQMRwq"> 图片尺寸为 16 的倍数</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="t6PJKhfbyALMzcCOgLFTWs"><input type="checkbox" data-page-node-id="BxzEEDoUy4FmCwIfqnbYFg"> 视频 V2.5 Flash 的 size 固定为 720P</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;" data-page-node-id="tdta4dAdVjOv8CIDQ9pSGe"><input type="checkbox" data-page-node-id="BnTYqk8cFVBJoVup7J2ZLa"> 已了解 RPM 限制（文本 20 / 图片 1K 20 / 视频 1）</label>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ===== Constants =====
+const STORAGE_KEY_API = 'agnes_api_key';
+const STORAGE_KEY_URL = 'agnes_base_url';
+const STORAGE_KEY_HISTORY = 'agnes_history';
+
+// ===== Navigation =====
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(item.dataset.target).classList.add('active');
+    if (window.innerWidth <= 768) toggleSidebar(true);
+  });
+});
+
+function toggleSidebar(forceClose) {
+  const sidebar = document.getElementById('sidebar');
+  if (forceClose || sidebar.classList.contains('collapsed')) {
+    sidebar.classList.remove('collapsed');
+  } else {
+    sidebar.classList.add('collapsed');
+  }
+}
+
+// ===== Base URL & Model Switching =====
+function onBaseUrlChange() {
+  const url = document.getElementById('base-url-select').value;
+  localStorage.setItem(STORAGE_KEY_URL, url);
+}
+
+function onImageResChange() {
+  const res = document.getElementById('image-res').value;
+  const sizeSelect = document.getElementById('image-size');
+  const options = {
+    '1k': [
+      { value: '1024x1024', text: '1024×1024（方形）' },
+      { value: '1024x768', text: '1024×768（横向 4:3）' },
+      { value: '768x1024', text: '768×1024（竖向 3:4）' }
+    ],
+    '2k': [
+      { value: '2048x2048', text: '2048×2048（方形）' },
+      { value: '2048x1536', text: '2048×1536（横向）' },
+      { value: '1536x2048', text: '1536×2048（竖向）' }
+    ],
+    '3k': [
+      { value: '3072x3072', text: '3072×3072（方形）' },
+      { value: '3072x2304', text: '3072×2304（横向）' },
+      { value: '2304x3072', text: '2304×3072（竖向）' }
+    ],
+    '4k': [
+      { value: '4096x4096', text: '4096×4096（方形）' },
+      { value: '4096x3072', text: '4096×3072（横向）' },
+      { value: '3072x4096', text: '3072×4096（竖向）' }
+    ]
+  };
+  const opts = options[res] || options['1k'];
+  sizeSelect.innerHTML = opts.map(o => `<option value="${o.value}" ${o.value === '1024x1024' ? 'selected' : ''}>${o.text}</option>`).join('');
+}
+
+function buildDynamicRow(containerId, model) {
+  const container = document.getElementById(containerId);
+  if (model === 'agnes-video-2.5-flash') {
+    container.innerHTML = `
+      <div class="form-group">
+        <label class="field-label">时长 (seconds)</label>
+        <select id="${containerId}-duration">
+          <option value="4">4 秒</option>
+          <option value="5" selected>5 秒（默认）</option>
+          <option value="6">6 秒</option>
+          <option value="8">8 秒</option>
+          <option value="10">10 秒</option>
+          <option value="12">12 秒（最长）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">分辨率</label>
+        <select id="${containerId}-size">
+          <option value="720P" selected>720P（固定，免费）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">🎲 随机种子（可选）</label>
+        <input type="number" id="${containerId}-seed" placeholder="留空随机" min="0" max="4294967295" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+      </div>`;
+  } else if (model === 'agnes-video-2.5') {
+    container.innerHTML = `
+      <div class="form-group">
+        <label class="field-label">时长 (seconds)</label>
+        <select id="${containerId}-duration">
+          <option value="4">4 秒</option>
+          <option value="5" selected>5 秒</option>
+          <option value="6">6 秒</option>
+          <option value="8">8 秒</option>
+          <option value="10">10 秒</option>
+          <option value="12">12 秒（最长）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">分辨率</label>
+        <select id="${containerId}-size">
+          <option value="720P" selected>720P ($0.025/s)</option>
+          <option value="960P">960P ($0.040/s)</option>
+          <option value="2K">2K ($0.055/s)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">🎲 随机种子（可选）</label>
+        <input type="number" id="${containerId}-seed" placeholder="留空随机" min="0" max="4294967295" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+      </div>`;
+  } else {
+    container.innerHTML = `
+      <div class="form-group">
+        <label class="field-label">帧数 (num_frames)</label>
+        <select id="${containerId}-frames">
+          <option value="81">81（约 3.4 秒）</option>
+          <option value="121" selected>121（约 5.0 秒）</option>
+          <option value="161">161（约 6.7 秒）</option>
+          <option value="241">241（约 10 秒）</option>
+          <option value="361">361（约 15 秒）</option>
+          <option value="441">441（约 18.4 秒）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">帧率 (fps)</label>
+        <select id="${containerId}-fps">
+          <option value="24" selected>24（推荐）</option>
+          <option value="25">25</option>
+          <option value="30">30</option>
+          <option value="12">12（更长）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">🎲 随机种子（可选）</label>
+        <input type="number" id="${containerId}-seed" placeholder="留空随机" min="0" max="4294967295" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+      </div>`;
+  }
+}
+
+function applyModelSwitch(section) {
+  let model;
+  if (section === 'video') model = document.getElementById('video-model').value;
+  else if (section === 'img2vid') model = document.getElementById('img2vid-model').value;
+  else model = document.getElementById('keyframes-model').value;
+  const rowId = section + '-dynamic-row';
+  buildDynamicRow(rowId, model);
+}
+
+function setupModelListeners() {
+  const videoModel = document.getElementById('video-model');
+  const img2vidModel = document.getElementById('img2vid-model');
+  const keyframesModel = document.getElementById('keyframes-model');
+  videoModel.addEventListener('change', () => applyModelSwitch('video'));
+  img2vidModel.addEventListener('change', () => applyModelSwitch('img2vid'));
+  keyframesModel.addEventListener('change', () => applyModelSwitch('keyframes'));
+  buildDynamicRow('video-dynamic-row', videoModel.value);
+  buildDynamicRow('img2vid-dynamic-row', img2vidModel.value);
+  buildDynamicRow('keyframes-dynamic-row', keyframesModel.value);
+}
+
+// ===== API Key Management =====
+function loadApiKey() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  const savedUrl = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  // Set select to match saved URL
+  const sel = document.getElementById('base-url-select');
+  if (savedUrl.includes('.cn/')) sel.value = 'https://apihub.agnes-ai.cn/v1';
+  else sel.value = 'https://apihub.agnes-ai.com/v1';
+  document.getElementById('base-url').value = savedUrl.replace('/v1', '');
+  if (key) {
+    document.getElementById('api-key-input').value = key;
+    document.getElementById('clear-key-btn').style.display = 'inline-flex';
+    checkKeyStatus(key);
+  }
+}
+
+async function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  const url = document.getElementById('base-url-select').value;
+  if (!key) { showToast('请输入 API Key', 'warn'); return; }
+  localStorage.setItem(STORAGE_KEY_API, key);
+  localStorage.setItem(STORAGE_KEY_URL, url);
+  document.getElementById('clear-key-btn').style.display = 'inline-flex';
+  showToast('API Key 已保存', 'ok');
+  await checkKeyStatus(key);
+}
+
+async function clearApiKey() {
+  localStorage.removeItem(STORAGE_KEY_API);
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('clear-key-btn').style.display = 'none';
+  document.getElementById('key-status').innerHTML = '';
+  showToast('API Key 已删除', 'err');
+}
+
+function toggleKeyVisibility() {
+  const input = document.getElementById('api-key-input');
+  if (input.type === 'password') {
+    input.type = 'text';
+    event.target.textContent = '🙈 隐藏';
+  } else {
+    input.type = 'password';
+    event.target.textContent = '👁️ 显示';
+  }
+}
+
+async function checkKeyStatus(key) {
+  const url = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const statusDiv = document.getElementById('key-status');
+  statusDiv.innerHTML = '<div class="status-bar"><span class="spinner"></span> 正在验证 API Key...</div>';
+  try {
+    const resp = await fetch(`${url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({
+        model: 'agnes-2.5-flash',
+        messages: [{ role: 'user', content: 'Hi' }],
+        max_tokens: 10
+      })
+    });
+    if (resp.ok) {
+      const data = await resp.json();
+      const model = data.model || 'unknown';
+      statusDiv.innerHTML = `<div class="alert alert-ok"><strong>✅ 验证成功！</strong> 模型：${model}</div>`;
+    } else {
+      const errData = await resp.json().catch(() => ({}));
+      statusDiv.innerHTML = `<div class="alert alert-err"><strong>❌ 验证失败 (${resp.status})</strong> ${errData.error?.message || '请检查 API Key 是否正确'}</div>`;
+    }
+  } catch (e) {
+    statusDiv.innerHTML = `<div class="alert alert-err"><strong>❌ 网络错误</strong> ${e.message}</div>`;
+  }
+}
+
+// ===== Toast =====
+function showToast(msg, type = 'info') {
+  const colors = { ok: '#22c55e', err: '#ef4444', warn: '#f59e0b', info: '#3b82f6' };
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.background = colors[type] || colors.info;
+  toast.style.color = '#fff';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+// ===== Chat =====
+const chatConfig = { model: 'agnes-2.5-flash', temp: 0.7, maxTokens: 2048, system: '', thinking: 'off' };
+let chatHistory = [];
+let chatLoading = false;
+
+function formatChatContent(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre style="background:var(--code-bg);padding:8px;border-radius:6px;margin:6px 0;font-size:12px;overflow-x:auto;"><code>$2</code></pre>');
+  html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,.1);padding:1px 4px;border-radius:3px;font-size:12px;">$1</code>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
+function addChatBubble(role, content, isLoading) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:10px;' + (role === 'user' ? 'flex-direction:row-reverse;' : '');
+  const avatar = document.createElement('div');
+  avatar.style.cssText = 'width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:' +
+    (role === 'assistant' ? 'var(--accent2)' : role === 'system' ? 'var(--muted)' : 'var(--accent)');
+  avatar.textContent = role === 'assistant' ? '🧠' : role === 'system' ? '⚙️' : '👤';
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-bubble-wrap';
+  wrap.style.cssText = 'max-width:75%;';
+  const bubble = document.createElement('div');
+  bubble.style.cssText = 'padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.6;' +
+    (role === 'user' ? 'background:var(--accent);color:#fff;border-bottom-right-radius:4px;' : 'background:var(--card2);border:1px solid var(--border);border-bottom-left-radius:4px;');
+  if (isLoading) {
+    bubble.innerHTML = '<span class="spinner"></span> 思考中...';
+  } else {
+    bubble.innerHTML = formatChatContent(content);
+  }
+  div.appendChild(avatar);
+  wrap.appendChild(bubble);
+  div.appendChild(wrap);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return bubble;
+}
+
+function updateMsgCount() {
+  document.getElementById('msg-count').textContent = chatHistory.length;
+}
+
+async function sendChatMsg() {
+  if (chatLoading) return;
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const input = document.getElementById('chat-input');
+  const userContent = input.value.trim();
+  if (!userContent) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addChatBubble('user', userContent);
+  chatHistory.push({ role: 'user', content: userContent });
+  updateMsgCount();
+  await callChatAPI();
+}
+
+async function callChatAPI() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) return;
+  const url = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const body = {
+    model: chatConfig.model,
+    messages: (chatConfig.system ? [{ role: 'system', content: chatConfig.system }] : []).concat(chatHistory),
+    temperature: chatConfig.temp,
+    max_tokens: chatConfig.maxTokens
+  };
+  if (chatConfig.thinking === 'openai') body.chat_template_kwargs = { enable_thinking: true };
+  else if (chatConfig.thinking === 'anthropic') body.thinking = { type: 'enabled', budget_tokens: 2048 };
+
+  chatLoading = true;
+  document.getElementById('chat-send-btn').disabled = true;
+  const loadingBubble = addChatBubble('assistant', '', true);
+  try {
+    const resp = await fetch(`${url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    const content = data.choices?.[0]?.message?.content || '无回复内容';
+    chatHistory.push({ role: 'assistant', content: content });
+    updateMsgCount();
+    loadingBubble.innerHTML = formatChatContent(content);
+    document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+    const lastUser = chatHistory.filter(m => m.role === 'user').pop();
+    addHistory('💬', (lastUser?.content || '').substring(0, 80), content.substring(0, 200));
+  } catch (e) {
+    loadingBubble.innerHTML = `<div class="alert alert-err" style="padding:6px 10px;font-size:12px;">❌ ${escapeHtml(e.message)}</div>`;
+  } finally {
+    chatLoading = false;
+    document.getElementById('chat-send-btn').disabled = false;
+  }
+}
+
+function clearChat() {
+  chatHistory = [];
+  document.getElementById('chat-messages').innerHTML = '';
+  updateMsgCount();
+  showToast('对话已清空', 'ok');
+}
+
+// ===== Image Generation =====
+async function generateImage() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  // Ensure url is the full /v1 base - strip any trailing path segments beyond /v1
+  let url = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  // Remove any extra trailing slashes, keep only up to /v1
+  url = url.replace(/\/v1\/?$/, '') + '/v1';
+  const model = document.getElementById('image-model').value;
+  const size = document.getElementById('image-size').value;
+  const prompt = document.getElementById('image-prompt').value.trim();
+  const seedInput = document.getElementById('image-seed').value.trim();
+  const format = document.getElementById('image-format').value;
+
+  if (!prompt) { showToast('请输入提示词', 'warn'); return; }
+
+  const output = document.getElementById('image-output');
+  output.innerHTML = '<span class="spinner"></span> 正在生成图片（约 10-30 秒）...';
+
+  const body = { model, prompt, size, n: 1 };
+  // response_format must be inside extra_body
+  body.extra_body = { response_format: format };
+  // Add seed for reproducible results
+  if (seedInput) body.seed = parseInt(seedInput);
+
+  try {
+    const resp = await fetch(`${url}/images/generations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    if (data.data && data.data.length > 0) {
+      const item = data.data[0];
+      let html = '';
+      if (item.url) {
+        html = `<img src="${item.url}" alt="generated image" style="max-width:100%;border-radius:8px;margin:8px 0;">
+                <div style="margin-top:8px;"><a href="${item.url}" target="_blank" style="color:var(--accent);font-size:13px;">🔗 在新窗口打开</a></div>`;
+      } else if (item.b64_json) {
+        html = `<img src="data:image/png;base64,${item.b64_json}" alt="generated image" style="max-width:100%;border-radius:8px;margin:8px 0;">`;
+      } else {
+        html = `<pre><code>${escapeHtml(JSON.stringify(item, null, 2))}</code></pre>`;
+      }
+      output.innerHTML = html;
+      addHistory('🖼️', prompt.substring(0, 60), '图片已生成');
+    } else {
+      output.innerHTML = `<div class="alert alert-err">❌ 未获取到图片数据</div><pre><code>${escapeHtml(JSON.stringify(data, null, 2))}</code></pre>`;
+    }
+  } catch (e) {
+    output.innerHTML = `<div class="alert alert-err">❌ 请求失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ===== Video Generation (supports both 2.5 Flash and v2.0) =====
+let videoPollTimer = null;
+
+async function generateVideo() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const apiUrl = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const baseUrl = apiUrl.replace('/v1', '');
+  const model = document.getElementById('video-model').value;
+  const prompt = document.getElementById('video-prompt').value.trim();
+  const ratio = document.getElementById('video-ratio').value;
+  const mode = document.getElementById('video-mode').value;
+  const seedInput = document.getElementById('video-seed').value.trim();
+  const duration = parseInt(document.getElementById('video-duration-slider')?.value || 5);
+  const statusDiv = document.getElementById('video-status');
+  const outputDiv = document.getElementById('video-output');
+  outputDiv.innerHTML = '';
+
+  if (!prompt) { showToast('请输入提示词', 'warn'); return; }
+
+  let body;
+  if (model === 'agnes-video-2.5-flash') {
+    body = {
+      model,
+      prompt,
+      mode,
+      seconds: String(duration),
+      size: '720P',
+      aspect_ratio: ratio,
+      n: 1
+    };
+    // 2.5 Flash 不支持 negative_prompt
+    if (seedInput) body.seed = parseInt(seedInput);
+    statusDiv.innerHTML = `<div class="alert alert-info">🎬 视频 <strong>${duration}秒</strong> (${ratio})，提交任务中...</div>`;
+  } else if (model === 'agnes-video-2.5') {
+    const sizeSelect = document.querySelector('#video-dynamic-row select:last-of-type')?.value || '720P';
+    body = {
+      model,
+      prompt,
+      mode,
+      seconds: String(duration),
+      size: sizeSelect,
+      aspect_ratio: ratio,
+      n: 1
+    };
+    if (seedInput) body.seed = parseInt(seedInput);
+    statusDiv.innerHTML = `<div class="alert alert-info">🎬 视频 <strong>${duration}秒</strong> (${ratio}, ${sizeSelect})，提交任务中...</div>`;
+  } else {
+    // v2.0
+    const framesSelect = document.querySelector('#video-dynamic-row select');
+    const fpsSelect = document.querySelector('#video-dynamic-row select:last-of-type');
+    const numFrames = parseInt(framesSelect?.value || 121);
+    const frameRate = parseInt(fpsSelect?.value || 24);
+    const [w, h] = ratio === '9:16' ? [768, 1152] : ratio === '1:1' ? [768, 768] : ratio === '21:9' ? [1536, 640] : [1152, 768];
+    body = {
+      model,
+      prompt,
+      mode,
+      num_frames: numFrames,
+      frame_rate: frameRate,
+      width: w,
+      height: h
+    };
+    // V2.0 支持 negative_prompt
+    const negative = document.getElementById('video-negative').value.trim();
+    if (negative) body.negative_prompt = negative;
+    if (seedInput) body.seed = parseInt(seedInput);
+    const durationSec = (numFrames / frameRate).toFixed(1);
+    statusDiv.innerHTML = `<div class="alert alert-info">🎬 视频约 <strong>${durationSec}秒</strong>（${numFrames}帧@${frameRate}fps），提交任务中...</div>`;
+  }
+
+  try {
+    const resp = await fetch(`${apiUrl}/videos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    const videoId = data.video_id || data.data?.video_id;
+    if (!videoId) throw new Error('未获取到 video_id');
+    statusDiv.innerHTML += `<div class="alert alert-info">🔄 任务已创建！<span class="spinner"></span></div>`;
+    outputDiv.innerHTML = '';
+    pollVideoStatus(baseUrl, key, videoId, outputDiv, statusDiv, '🎬', model);
+  } catch (e) {
+    statusDiv.innerHTML = `<div class="alert alert-err">❌ 提交失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function pollVideoStatus(baseUrl, key, videoId, outputDiv, statusDiv, historyIcon, modelName) {
+  if (videoPollTimer) clearInterval(videoPollTimer);
+  const pollUrl = `${baseUrl}/agnesapi?video_id=${videoId}${modelName ? '&model_name=' + modelName : ''}`;
+  let attempts = 0;
+  const maxAttempts = 60; // 最多轮询5分钟
+  const tryPoll = async () => {
+    attempts++;
+    if (attempts > maxAttempts) {
+      if (videoPollTimer) clearInterval(videoPollTimer);
+      statusDiv.innerHTML += `<div class="alert alert-warn">⏰ 轮询超时（${maxAttempts}次），请手动重试或使用 <code class="code-inline">${pollUrl}</code> 查询</div>`;
+      return;
+    }
+    try {
+      const resp = await fetch(pollUrl, { headers: { 'Authorization': `Bearer ${key}` } });
+      if (resp.ok) {
+        const data = await resp.json();
+        processVideoResponse(data, outputDiv, statusDiv, historyIcon || '🎬', attempts);
+      }
+    } catch (e) { /* continue polling */ }
+  };
+  tryPoll();
+  videoPollTimer = setInterval(tryPoll, 5000);
+}
+
+function processVideoResponse(data, outputDiv, statusDiv, historyIcon, attempts) {
+  const status = data.status || '';
+  if (status === 'completed' || status === 'succeed') {
+    if (videoPollTimer) clearInterval(videoPollTimer);
+    let videoUrl = data.remixed_from_video_id || data.data?.remixed_from_video_id || data.video_url || data.url;
+    if (videoUrl) {
+      statusDiv.innerHTML = `<div class="alert alert-ok">✅ 视频生成完成！（轮询${attempts}次）</div>`;
+      outputDiv.innerHTML = `<video controls autoplay style="max-width:100%;border-radius:8px;"><source src="${videoUrl}"></video>
+        <div style="margin-top:8px;"><a href="${videoUrl}" target="_blank" style="color:var(--accent);font-size:13px;">🔗 在新窗口打开/下载</a></div>`;
+      addHistory(historyIcon, '视频生成', '视频已生成');
+    } else {
+      statusDiv.innerHTML = '<div class="alert alert-warn">⚠️ 任务完成但未找到视频 URL</div>';
+      outputDiv.innerHTML = `<pre><code>${escapeHtml(JSON.stringify(data, null, 2))}</code></pre>`;
+    }
+  } else if (status === 'failed') {
+    if (videoPollTimer) clearInterval(videoPollTimer);
+    statusDiv.innerHTML = '<div class="alert alert-err">❌ 视频生成失败</div>';
+    outputDiv.innerHTML = `<pre><code>${escapeHtml(JSON.stringify(data, null, 2))}</code></pre>`;
+  }
+}
+
+// ===== Prompt Generators =====
+async function generateImagePrompt() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const url = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const userDesc = document.getElementById('prompt-image-input').value.trim();
+  const style = document.getElementById('prompt-image-style').value;
+  const size = document.getElementById('prompt-image-size').value;
+  const negInput = document.getElementById('prompt-image-negative').value.trim();
+  if (!userDesc) { showToast('请输入描述', 'warn'); return; }
+  const output = document.getElementById('prompt-image-output');
+  output.innerHTML = '<span class="spinner"></span> 正在生成专业提示词...';
+
+  // 高质量系统提示词 - 要求结构化输出
+  const systemPrompt = `You are an expert AI image prompt engineer. Convert simple descriptions into highly detailed, professional English prompts optimized for text-to-image models (DALL-E, Midjourney, Stable Diffusion, etc.).
+
+STRUCTURE: Subject + Scene/Environment + Style/Medium + Lighting + Camera/Angle + Mood/Atmosphere + Color Palette + Quality/Technical keywords
+
+FORMAT YOUR RESPONSE AS:
+【Positive Prompt】
+[Detailed prompt here, 3-5 sentences]
+
+【Negative Prompt】
+[Common quality issues to avoid, comma-separated]
+
+RULES:
+- Always write prompts in English
+- Add specific lighting details (golden hour, studio lighting, volumetric, etc.)
+- Specify camera angle and lens type when relevant
+- Include quality keywords (8K, highly detailed, professional, etc.)
+- Consider the specified aspect ratio in composition
+- Make it vivid and cinematic
+- Output exactly in the format above`;
+
+  const styleMap = {
+    '': '',
+    'cinematic': ', cinematic composition, film grain, anamorphic lens',
+    'photorealistic': ', photorealistic, DSLR photography, shallow depth of field',
+    'anime': ', anime style, cel shading, vibrant colors, manga aesthetic',
+    'watercolor': ', watercolor painting style, soft edges, fluid brushstrokes, artistic',
+    'oil-painting': ', oil painting style, rich textures, visible brushstrokes, classical technique',
+    '3d-render': ', 3D render, CGI, octane render, volumetric lighting, subsurface scattering',
+    'pixel-art': ', pixel art style, retro gaming aesthetic, 16-bit, dithering',
+    'minimalist': ', minimalist composition, clean lines, negative space, simple geometry',
+    'cyberpunk': ', cyberpunk aesthetic, neon lights, rain-soaked streets, futuristic cityscape',
+    'fantasy': ', fantasy art style, magical atmosphere, ethereal glow, detailed worldbuilding',
+    'pop-art': ', pop art style, bold colors, comic book aesthetics, halftone patterns',
+    'concept-art': ', concept art style, digital painting, artistic vision, detailed environment design',
+    'illustration': ', illustration style, clean lines, flat colors, graphic design',
+    'vintage': ', vintage photography style, film grain, faded colors, nostalgic atmosphere',
+    'line-art': ', line art style, clean outlines, monochrome, minimalist drawing'
+  };
+
+  const ratioHints = {
+    '1:1': 'square composition, centered subject',
+    '4:3': 'classic landscape orientation, balanced framing',
+    '16:9': 'wide cinematic aspect ratio, panoramic composition',
+    '9:16': 'portrait orientation, vertical composition',
+    '3:4': 'tall vertical composition, full body shot',
+    '21:9': 'ultrawide cinematic format, epic landscape'
+  };
+
+  const styleHint = styleMap[style] || '';
+  const ratioHint = ratioHints[size] || '';
+  const negPrompt = negInput || '';
+
+  const body = {
+    model: 'agnes-2.5-flash',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Generate a professional image prompt for: "${userDesc}". Style: ${style || 'not specified'}. Aspect ratio: ${size || '1:1'}.${negPrompt ? '\n\nUser-provided negative prompt: ' + negPrompt : ''}` }
+    ],
+    temperature: 0.7,
+    max_tokens: 800
+  };
+
+  try {
+    const resp = await fetch(`${url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error?.message || `HTTP ${resp.status}`); }
+    const data = await resp.json();
+    const rawContent = data.choices?.[0]?.message?.content || '无内容';
+
+    // 解析输出，分离正负提示词
+    const posMatch = rawContent.match(/【Positive Prompt】\s*([\s\S]*?)(?=【Negative Prompt】|$)/);
+    const negMatch = rawContent.match(/【Negative Prompt】\s*([\s\S]*)/);
+    const positivePrompt = posMatch ? posMatch[1].trim() : rawContent;
+    const negativePrompt = negMatch ? negMatch[1].trim() : '';
+
+    // 显示正面提示词
+    document.getElementById('prompt-image-positive-text').innerHTML = `<pre style="background:var(--code-bg);padding:14px;border-radius:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${escapeHtml(positivePrompt)}</pre>`;
+    document.getElementById('prompt-image-result').style.display = 'block';
+
+    // 显示负面提示词（如有）
+    if (negativePrompt) {
+      document.getElementById('prompt-image-negative-text').innerHTML = `<pre style="background:var(--code-bg);padding:14px;border-radius:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--text-secondary);">${escapeHtml(negativePrompt)}</pre>`;
+      document.getElementById('prompt-image-negative-result').style.display = 'block';
+    } else {
+      document.getElementById('prompt-image-negative-result').style.display = 'none';
+    }
+
+    // 显示参数信息
+    document.getElementById('prompt-image-meta-text').innerHTML = `<div style="padding:12px;"><strong>比例：</strong>${size || '1:1'}<br><strong>风格：</strong>${style || '默认'}</div>`;
+    document.getElementById('prompt-image-meta').style.display = 'block';
+
+    addHistory('✨', `图片提示词: ${userDesc.substring(0, 30)}`, '已生成');
+    showToast('✅ 提示词生成完成！', 'ok');
+  } catch (e) {
+    output.innerHTML = `<div class="alert alert-err">❌ 请求失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function generateVideoPrompt() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const url = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const userDesc = document.getElementById('prompt-video-input').value.trim();
+  const style = document.getElementById('prompt-video-style').value;
+  const camera = document.getElementById('prompt-video-camera').value;
+  const negInput = document.getElementById('prompt-video-negative').value.trim();
+  if (!userDesc) { showToast('请输入描述', 'warn'); return; }
+  const output = document.getElementById('prompt-video-output');
+  output.innerHTML = '<span class="spinner"></span> 正在生成专业提示词...';
+
+  // 高质量视频系统提示词
+  const systemPrompt = `You are an expert AI video prompt engineer. Convert simple descriptions into highly detailed, professional English video prompts optimized for text-to-video models.
+
+STRUCTURE: [Subject] + [Action/Movement] + [Scene/Environment] + [Camera Movement] + [Lighting] + [Style/Aesthetic] + [Duration/Pacing] + [Quality keywords]
+
+FORMAT YOUR RESPONSE AS:
+【Positive Prompt】
+[Detailed video prompt here, 2-4 sentences]
+
+【Negative Prompt】
+[Things to avoid: blurry, shaky, low quality, etc.]
+
+【Suggested Settings】
+- Duration: [recommended length]
+- Style notes: [specific tips for this type of video]
+- Motion: [movement suggestions]
+
+RULES:
+- Always write prompts in English
+- Describe motion explicitly (how things move, speed, fluidity)
+- Specify camera movement and framing
+- Include lighting and atmosphere details
+- Add pacing/duration hints
+- For Flash model: keep under 5 seconds naturally implied
+- Output exactly in the format above`;
+
+  const styleMap = {
+    '': '',
+    'cinematic': ', cinematic filmmaking style, anamorphic lens, film grain, color graded',
+    'realistic': ', photorealistic, documentary style, natural lighting, authentic movement',
+    'anime': ', anime animation style, smooth motion, vibrant colors, Japanese animation aesthetic',
+    'documentary': ', documentary footage style, handheld camera feel, natural environments',
+    'commercial': ', commercial advertising style, polished, product showcase, studio quality',
+    'scifi': ', sci-fi aesthetic, futuristic elements, neon accents, technological atmosphere',
+    'fantasy': ', fantasy cinematic style, magical atmosphere, ethereal glow, otherworldly',
+    'horror': ', horror atmosphere, dark moody lighting, suspenseful tension, unsettling',
+    'noir': ', film noir style, high contrast, chiaroscuro lighting, black and white',
+    'vintage': ', vintage film aesthetic, 35mm film look, warm tones, film grain, nostalgic',
+    'timelapse': ', time-lapse photography, accelerated passage of time, dynamic clouds/movement',
+    'slow-motion': ', slow motion cinematography, fluid graceful movement, high frame rate look'
+  };
+
+  const cameraMap = {
+    '': '',
+    'slow tracking shot': ', slow tracking shot following the subject smoothly',
+    'pan right': ', slow pan to the right',
+    'pull back': ', gradual pull back revealing the scene',
+    'push in': ', smooth push in towards the subject',
+    'close up': ', close-up framing focusing on details',
+    'aerial view': ', aerial drone perspective, bird\'s eye view',
+    'dolly zoom': ', dolly zoom effect creating tension',
+    'orbit shot': ', 360-degree orbit around the subject',
+    'handheld shake': ', handheld camera movement with natural shake',
+    'steadicam': ', steadicam smooth following shot',
+    'tilt up': ', slow tilt upward revealing scale',
+    'bird\'s eye view': ', top-down bird\'s eye perspective',
+    'low angle': ', low angle shot looking up dramatically'
+  };
+
+  const styleHint = styleMap[style] || '';
+  const cameraHint = cameraMap[camera] || '';
+
+  const body = {
+    model: 'agnes-2.5-flash',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Generate a professional video prompt for: "${userDesc}". Style: ${style || 'not specified'}. Camera movement: ${camera || 'not specified'}.${negInput ? '\n\nUser negative prompt: ' + negInput : ''}` }
+    ],
+    temperature: 0.7,
+    max_tokens: 800
+  };
+
+  try {
+    const resp = await fetch(`${url}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error?.message || `HTTP ${resp.status}`); }
+    const data = await resp.json();
+    const rawContent = data.choices?.[0]?.message?.content || '无内容';
+
+    // 解析输出
+    const posMatch = rawContent.match(/【Positive Prompt】\s*([\s\S]*?)(?=【Negative Prompt】|$)/);
+    const negMatch = rawContent.match(/【Negative Prompt】\s*([\s\S]*?)(?=【Suggested Settings】|$)/);
+    const metaMatch = rawContent.match(/【Suggested Settings】\s*([\s\S]*)/);
+    const positivePrompt = posMatch ? posMatch[1].trim() : rawContent;
+    const negativePrompt = negMatch ? negMatch[1].trim() : '';
+    const settings = metaMatch ? metaMatch[1].trim() : '';
+
+    // 显示正面提示词
+    document.getElementById('prompt-video-positive-text').innerHTML = `<pre style="background:var(--code-bg);padding:14px;border-radius:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${escapeHtml(positivePrompt)}</pre>`;
+    document.getElementById('prompt-video-result').style.display = 'block';
+
+    // 显示负面提示词
+    if (negativePrompt) {
+      document.getElementById('prompt-video-negative-text').innerHTML = `<pre style="background:var(--code-bg);padding:14px;border-radius:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:var(--text-secondary);">${escapeHtml(negativePrompt)}</pre>`;
+      document.getElementById('prompt-video-negative-result').style.display = 'block';
+    } else {
+      document.getElementById('prompt-video-negative-result').style.display = 'none';
+    }
+
+    // 显示建议参数
+    if (settings) {
+      document.getElementById('prompt-video-meta-text').innerHTML = `<pre style="background:var(--code-bg);padding:14px;border-radius:8px;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${escapeHtml(settings)}</pre>`;
+      document.getElementById('prompt-video-meta').style.display = 'block';
+    } else {
+      document.getElementById('prompt-video-meta').style.display = 'none';
+    }
+
+    addHistory('✨', `视频提示词: ${userDesc.substring(0, 30)}`, '已生成');
+    showToast('✅ 视频提示词生成完成！', 'ok');
+  } catch (e) {
+    output.innerHTML = `<div class="alert alert-err">❌ 请求失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ===== Prompt Templates =====
+function useTemplate(type, name) {
+  const templates = {
+    image: {
+      product: 'Professional product photography of [product name], isolated on [color] seamless background, soft studio lighting with subtle shadows, 45-degree angle, sharp focus, commercial advertising quality, 8K resolution, clean and minimal composition',
+      poster: 'Eye-catching social media poster design featuring [theme/topic], bold modern typography with [color] accent, [style] color palette, dynamic diagonal composition, high contrast, professional graphic design, 4K',
+      portrait: 'Professional portrait of [person description], [expression], wearing [outfit], natural skin texture, soft directional lighting from [direction], [background], shot on [lens], cinematic bokeh, high-end fashion photography style',
+      landscape: 'Breathtaking [scene type] at [time of day], [weather conditions], golden hour or blue hour lighting, dramatic cloud formations, ultra-wide angle 16:9 aspect ratio, National Geographic style, 8K resolution, photorealistic',
+      architecture: 'Architectural photography of [building], dramatic low-angle perspective, golden hour lighting, leading lines, sharp details, professional building photography, 8K, clean composition',
+      anime: 'Anime style illustration of [character], [pose/action], vibrant saturated colors, detailed anime background, studio Ghibli inspired, high quality manga art, cel-shaded, 4K',
+      fantasy: 'Epic fantasy scene with [subject], magical atmosphere, ethereal lighting, enchanted forest or mystical landscape, detailed worldbuilding, concept art style, dramatic composition',
+      cyberpunk: 'Cyberpunk cityscape at night, neon-lit streets reflecting on wet pavement, holographic advertisements, futuristic architecture, volumetric fog, blade runner aesthetic, cinematic lighting',
+      minimalist: 'Minimalist composition with [subject], clean geometric shapes, generous negative space, [color] palette, contemporary design aesthetic, simple and elegant',
+      watercolor: 'Delicate watercolor painting of [subject], soft fluid brushstrokes, wet-on-wet technique, light and airy atmosphere, artistic paper texture, gallery quality',
+      vintage: 'Vintage photography style, faded warm tones, film grain, 35mm analog aesthetic, nostalgic mood, soft vignette, classic composition',
+      logo: 'Professional logo design for [brand], minimalist icon and typography, [style] aesthetic, clean scalable vector design, modern branding'
+    },
+    video: {
+      product: 'A [product] rotating slowly on a [background] platform, smooth 360-degree showcase, soft studio lighting with subtle reflections, clean and minimal, professional commercial video, 4K quality',
+      character: 'A [person description] performing [action], natural fluid movement, [scene setting], [camera movement], cinematic lighting, realistic motion capture quality',
+      nature: 'Time-lapse of [natural scene], dramatic clouds moving, sun rising/setting, nature documentary style, hyperlapse photography, epic scale',
+      food: 'Close-up macro shot of [food being prepared], steam rising, chef hands visible, warm kitchen lighting, slow-motion details, food photography video, mouth-watering',
+      transition: 'Smooth cinematic transition from [scene A] to [scene B], maintaining visual continuity, dramatic lighting change, professional editing style',
+      sports: 'Slow-motion footage of [sporting action], dramatic lighting, sweat droplets frozen in air, intense athletic moment, ESPN broadcast quality',
+      city: 'Urban time-lapse of [city], car light trails, busy street life, sunset to night transition, aerial drone shots, cinematic cityscape',
+      abstract: 'Abstract visual journey, morphing geometric shapes, [color] color palette, fluid animations, generative art style, mesmerizing transitions',
+      tutorial: 'Screen recording style tutorial showing [process], smooth cursor movements, clear step-by-step demonstration, professional presentation',
+      fashion: 'Fashion show runway footage, model walking, dynamic camera angles, dramatic lighting, haute couture, Vogue editorial style'
+    }
+  };
+  const t = templates[type]?.[name];
+  if (!t) return;
+  if (type === 'image') {
+    document.getElementById('prompt-image-input').value = t;
+  } else {
+    document.getElementById('prompt-video-input').value = t;
+  }
+  showToast('✅ 模板已填入，修改描述后点击"生成提示词"', 'info');
+}
+
+// ===== Image-to-Image =====
+async function generateImg2Img() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const baseUrl = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com';
+  const apiUrl = baseUrl.includes('.cn') ? baseUrl + '/v1' : baseUrl + '/v1';
+  const model = document.getElementById('img2img-model').value;
+  const size = document.getElementById('img2img-size').value;
+  const imageUrl = document.getElementById('img2img-image').value.trim();
+  const prompt = document.getElementById('img2img-prompt').value.trim();
+  const seedInput = document.getElementById('img2img-seed').value.trim();
+  const format = document.getElementById('img2img-format').value;
+
+  if (!imageUrl) { showToast('请输入原图 URL', 'warn'); return; }
+  if (!prompt) { showToast('请输入编辑指令', 'warn'); return; }
+
+  const output = document.getElementById('img2img-output');
+  output.innerHTML = '<span class="spinner"></span> 正在生成图片（约 10-30 秒）...';
+
+  // Must put image and response_format in extra_body
+  const body = {
+    model, prompt, size, n: 1,
+    extra_body: { image: [imageUrl], response_format: format }
+  };
+  // Add seed for reproducible results
+  if (seedInput) body.seed = parseInt(seedInput);
+
+  try {
+    const resp = await fetch(`${apiUrl}/images/generations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    if (data.data && data.data.length > 0) {
+      const item = data.data[0];
+      let html = '';
+      if (item.url) {
+        html = `<img src="${item.url}" alt="generated" style="max-width:100%;border-radius:8px;margin:8px 0;">
+                <div style="margin-top:8px;"><a href="${item.url}" target="_blank" style="color:var(--accent);font-size:13px;">🔗 在新窗口打开</a></div>`;
+      } else if (item.b64_json) {
+        html = `<img src="data:image/png;base64,${item.b64_json}" alt="generated" style="max-width:100%;border-radius:8px;margin:8px 0;">`;
+      } else {
+        html = `<pre><code>${escapeHtml(JSON.stringify(item, null, 2))}</code></pre>`;
+      }
+      output.innerHTML = html;
+      addHistory('🎨', `图生图: ${prompt.substring(0, 60)}`, '图片已生成');
+    } else {
+      output.innerHTML = `<div class="alert alert-err">❌ 未获取到图片数据</div><pre><code>${escapeHtml(JSON.stringify(data, null, 2))}</code></pre>`;
+    }
+  } catch (e) {
+    output.innerHTML = `<div class="alert alert-err">❌ 请求失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function useImg2ImgTemplate(type) {
+  const templates = {
+    style: 'Transform this image into [target style] style while preserving the main subject and composition',
+    color: 'Change the [object] color to [color] while keeping the original lighting and shadows',
+    bg: 'Replace the background with [new background], keep the foreground subject unchanged, match the lighting',
+    element: 'Add [elements] to the scene, maintain the original style and perspective, natural integration'
+  };
+  const t = templates[type];
+  if (!t) return;
+  document.getElementById('img2img-prompt').value = t;
+  showToast('模板已填入，修改后点击"生成图片"', 'info');
+}
+
+// ===== Image-to-Video =====
+async function generateImg2Vid() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const apiUrl = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const baseUrl = apiUrl.replace('/v1', '');
+  const model = document.getElementById('img2vid-model').value;
+  const prompt = document.getElementById('img2vid-prompt').value.trim();
+  const negative = document.getElementById('img2vid-negative').value.trim();
+  const imageUrl = document.getElementById('img2vid-image').value.trim();
+  const ratio = document.getElementById('img2vid-ratio').value;
+  const statusDiv = document.getElementById('img2vid-status');
+  const outputDiv = document.getElementById('img2vid-output');
+  outputDiv.innerHTML = '';
+
+  if (!imageUrl) { showToast('请输入原图 URL', 'warn'); return; }
+  if (!prompt) { showToast('请输入动画描述', 'warn'); return; }
+
+  let body;
+  if (model === 'agnes-video-2.5-flash') {
+    const duration = parseInt(document.getElementById('img2vid-dynamic-row').querySelector('#img2vid-dynamic-row select')?.value || 5);
+    body = {
+      model, prompt,
+      seconds: String(duration),
+      mode: 'reference',
+      size: '720P',
+      aspect_ratio: ratio,
+      extra_body: { images: [imageUrl] }
+    };
+    statusDiv.innerHTML = `<div class="alert alert-info">🎬 图生视频约 <strong>${duration}秒</strong>，提交任务中...</div>`;
+  } else {
+    const numFrames = parseInt(document.getElementById('img2vid-dynamic-row').querySelectorAll('select')[0]?.value || 121);
+    const frameRate = parseInt(document.getElementById('img2vid-dynamic-row').querySelectorAll('select')[1]?.value || 24);
+    const [w, h] = ratio === '9:16' ? [768, 1152] : ratio === '1:1' ? [768, 768] : [1152, 768];
+    body = {
+      model, prompt,
+      num_frames: numFrames,
+      frame_rate: frameRate,
+      width: w,
+      height: h,
+      extra_body: { image: [imageUrl] }
+    };
+    const duration = (numFrames / frameRate).toFixed(1);
+    statusDiv.innerHTML = `<div class="alert alert-info">🎬 图生视频约 <strong>${duration}秒</strong>，提交任务中...</div>`;
+    // V2.0 支持 negative_prompt
+    if (negative) body.negative_prompt = negative;
+  }
+
+  try {
+    const resp = await fetch(`${apiUrl}/videos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    const videoId = data.video_id || data.data?.video_id;
+    if (!videoId) throw new Error('未获取到 video_id');
+    statusDiv.innerHTML += `<div class="alert alert-info">🔄 图生视频任务已创建！<span class="spinner"></span></div>`;
+    outputDiv.innerHTML = '';
+    pollVideoStatus(baseUrl, key, videoId, outputDiv, statusDiv, '🖼️ 图生视频', model);
+  } catch (e) {
+    statusDiv.innerHTML = `<div class="alert alert-err">❌ 提交失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ===== Keyframes Video =====
+async function generateKeyframesVid() {
+  const key = localStorage.getItem(STORAGE_KEY_API);
+  if (!key) { showToast('请先设置 API Key', 'err'); return; }
+  const apiUrl = localStorage.getItem(STORAGE_KEY_URL) || 'https://apihub.agnes-ai.com/v1';
+  const baseUrl = apiUrl.replace('/v1', '');
+  const model = document.getElementById('keyframes-model').value;
+  const prompt = document.getElementById('keyframes-prompt').value.trim();
+  const negative = document.getElementById('keyframes-negative').value.trim();
+  const imagesText = document.getElementById('keyframes-images').value.trim();
+  const imageUrls = imagesText.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+  const ratio = document.getElementById('keyframes-ratio').value;
+  const statusDiv = document.getElementById('keyframes-status');
+  const outputDiv = document.getElementById('keyframes-output');
+  outputDiv.innerHTML = '';
+
+  if (imageUrls.length < 2) { showToast('请至少提供 2 张关键帧图片 URL', 'warn'); return; }
+  if (!prompt) { showToast('请输入过渡描述', 'warn'); return; }
+
+  let body;
+  if (model === 'agnes-video-2.5-flash') {
+    if (imageUrls.length > 5) { showToast('Flash版最多支持5张参考图', 'warn'); return; }
+    const duration = parseInt(document.getElementById('keyframes-dynamic-row').querySelectorAll('select')[0]?.value || 5);
+    body = {
+      model, prompt,
+      seconds: String(duration),
+      mode: 'reference',
+      size: '720P',
+      aspect_ratio: ratio,
+      extra_body: { images: imageUrls }
+    };
+    // 2.5 Flash 不支持 negative_prompt
+    statusDiv.innerHTML = `<div class="alert alert-info">🎞️ 关键帧视频约 <strong>${duration}秒</strong>，使用 ${imageUrls.length} 张参考图，提交中...</div>`;
+  } else if (model === 'agnes-video-2.5') {
+    if (imageUrls.length > 5) { showToast('付费版最多支持5张参考图', 'warn'); return; }
+    const duration = parseInt(document.getElementById('keyframes-dynamic-row').querySelectorAll('select')[0]?.value || 5);
+    const size = document.getElementById('keyframes-dynamic-row').querySelectorAll('select')[1]?.value || '720P';
+    body = {
+      model, prompt,
+      seconds: String(duration),
+      mode: 'reference',
+      size,
+      aspect_ratio: ratio,
+      extra_body: { images: imageUrls }
+    };
+    // 2.5 付费版不支持 negative_prompt
+    statusDiv.innerHTML = `<div class="alert alert-info">🎞️ 关键帧视频约 <strong>${duration}秒</strong>（${size}），使用 ${imageUrls.length} 张参考图，提交中...</div>`;
+  } else {
+    const numFrames = parseInt(document.getElementById('keyframes-dynamic-row').querySelectorAll('select')[0]?.value || 121);
+    const frameRate = parseInt(document.getElementById('keyframes-dynamic-row').querySelectorAll('select')[1]?.value || 24);
+    const [w, h] = ratio === '9:16' ? [768, 1152] : ratio === '1:1' ? [768, 768] : [1152, 768];
+    body = {
+      model, prompt,
+      num_frames: numFrames,
+      frame_rate: frameRate,
+      width: w,
+      height: h,
+      extra_body: { mode: 'keyframes', image: imageUrls }
+    };
+    // V2.0 支持 negative_prompt
+    if (negative) body.negative_prompt = negative;
+    const duration = (numFrames / frameRate).toFixed(1);
+    statusDiv.innerHTML = `<div class="alert alert-info">🎞️ 关键帧视频约 <strong>${duration}秒</strong>，使用 ${imageUrls.length} 张关键帧，提交中...</div>`;
+  }
+
+  try {
+    const resp = await fetch(`${apiUrl}/videos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    const videoId = data.video_id || data.data?.video_id;
+    if (!videoId) throw new Error('未获取到 video_id');
+    statusDiv.innerHTML += `<div class="alert alert-info">🔄 关键帧视频任务已创建！<span class="spinner"></span></div>`;
+    outputDiv.innerHTML = '';
+    pollVideoStatus(baseUrl, key, videoId, outputDiv, statusDiv, '🎞️ 关键帧视频', model);
+  } catch (e) {
+    statusDiv.innerHTML = `<div class="alert alert-err">❌ 提交失败：${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// ===== History =====
+function addHistory(icon, prompt, preview) {
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
+  history.unshift({ icon, prompt, preview, time: new Date().toLocaleString('zh-CN') });
+  if (history.length > 50) history.length = 50;
+  localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEY_HISTORY) || '[]');
+  const listDiv = document.getElementById('history-list');
+  const emptyDiv = document.getElementById('history-empty');
+  if (history.length === 0) {
+    emptyDiv.style.display = 'block';
+    listDiv.style.display = 'none';
+    return;
+  }
+  emptyDiv.style.display = 'none';
+  listDiv.style.display = 'block';
+  listDiv.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div class="h-time">${h.icon} ${h.time}</div>
+      <div class="h-prompt">${escapeHtml(h.prompt)}</div>
+    </div>
+  `).join('');
+}
+
+function clearHistory() {
+  localStorage.removeItem(STORAGE_KEY_HISTORY);
+  renderHistory();
+  showToast('历史记录已清空', 'ok');
+}
+
+// ===== Utilities =====
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function copyFromArea(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板', 'ok'));
+}
+
+// ===== Theme Toggle =====
+function toggleTheme() {
+  const root = document.documentElement;
+  const isLight = root.classList.contains('light');
+  if (isLight) {
+    root.classList.remove('light');
+    localStorage.setItem('agnes_theme', 'dark');
+    document.getElementById('theme-toggle').textContent = '🌙';
+  } else {
+    root.classList.add('light');
+    localStorage.setItem('agnes_theme', 'light');
+    document.getElementById('theme-toggle').textContent = '☀️';
+  }
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem('agnes_theme');
+  const root = document.documentElement;
+  if (saved === 'light') {
+    root.classList.add('light');
+    document.getElementById('theme-toggle').textContent = '☀️';
+  } else {
+    root.classList.remove('light');
+    document.getElementById('theme-toggle').textContent = '🌙';
+  }
+}
+
+// ===== Init =====
+document.addEventListener('DOMContentLoaded', () => {
+  loadApiKey();
+  renderHistory();
+  setupModelListeners();
+  loadTheme();
+
+  const saved = localStorage.getItem('agnes_chat_config');
+  if (saved) {
+    try {
+      const cfg = JSON.parse(saved);
+      Object.assign(chatConfig, cfg);
+      document.getElementById('chat-model').value = cfg.model || 'agnes-2.5-flash';
+      document.getElementById('chat-system').value = cfg.system || '';
+      document.getElementById('chat-temp').value = cfg.temp ?? 0.7;
+      document.getElementById('chat-max').value = cfg.maxTokens ?? 2048;
+      document.getElementById('chat-thinking').value = cfg.thinking || 'off';
+    } catch(e) {}
+  }
+});
+</script>
+</body>
+</html>
